@@ -3,30 +3,73 @@ name: Slack build and delpoy notification
 on:
   workflow_call:
     inputs:
-      config-path:
+      message_ts:
+        required: false
+        type: string
+      app_name:
         required: true
         type: string
-    secrets:
-      token:
+      target_name:
         required: true
+        type: string
+      status:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      build_number:
+        required: true
+        type: string
+      changelog:
+        required: false
+        type: string
 
 jobs:
   triage:
     runs-on: ubuntu-latest
     steps:
-   - id: slack
-     uses: slackapi/slack-github-action@v1.23.0
-     with:
-      channel-id: ${{ env.slack_channel }}
-      payload: |
+    - name: Prepare statuses
+      id: status
+      run: |
+        read -r -d '' JSON << EOF
         {
-            "text": "{TEXT}",
+            "building": {
+                "status": "🕑 *Building…*",
+                "color": null
+            },
+            "deploying": {
+                "status": "🕞 *Deploying…*",
+                "color": null
+            },
+            "success": {
+                "status": "🟢 *Built and deployed*",
+                "color": "green"
+            },
+            "build_error": {
+                "status": "🔴 *Building error*",
+                "color": "red"
+            },
+            "deploy_error": {
+                "status": "🔴 *Deploying error*",
+                "color": "red"
+            }
+        }
+        EOF
+        echo "JSON=$(echo $JSON)" >> $GITHUB_OUTPUT 
+    - id: slack
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+       channel-id: ${{ env.slack_channel }}
+       payload: |
+        {
+            "text": "${{ inputs.app_name }} → ${{ inputs.target_name }}",
             "blocks": [
                 {
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": "Alpha version → Google Disribution",
+                        "text": "${{ inputs.app_name }} → ${{ inputs.target_name }}",
                         "emoji": true
                     }
                 },
@@ -44,11 +87,11 @@ jobs:
                     "fields": [
                         {
                             "type": "mrkdwn",
-                            "text": "*Version:*\n{VERSION}"
+                            "text": "*Version:*\n${{ inputs.version }}"
                         },
                         {
                             "type": "mrkdwn",
-                            "text": "*Build number:*\n{BUILD}"
+                            "text": "*Build number:*\n${{ inputs.build_number }}"
                         }
                     ]
                 },
@@ -69,7 +112,7 @@ jobs:
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "*Changelog:*\n{CHANGELOG}"
+                        "text": "*Changelog:*\n${{ inputs.app_name }}"
                     }
                 },
                 {
@@ -81,5 +124,5 @@ jobs:
                 }
             ]
         }
-   env:
-    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
+    env:
+     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
