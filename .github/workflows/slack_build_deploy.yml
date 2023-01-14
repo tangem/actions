@@ -1,0 +1,85 @@
+name: Slack build and delpoy notification
+
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    steps:
+   - id: slack
+     uses: slackapi/slack-github-action@v1.23.0
+     with:
+      channel-id: ${{ env.slack_channel }}
+      payload: |
+        {
+            "text": "{TEXT}",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Alpha version → Google Disribution",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "context",
+                    "elements": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "{STATUS}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Version:*\n{VERSION}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Build number:*\n{BUILD}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Branch:*\n${{ github.ref_name }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Started by:*\n${{ github.actor }}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*Changelog:*\n{CHANGELOG}"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
+                    }
+                }
+            ]
+        }
+   env:
+    SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
