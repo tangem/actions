@@ -41,7 +41,7 @@ jobs:
     - name: Prepare statuses
       id: statuses
       run: |
-        if ${{ inputs.status  == "building" }}; then
+        if ${{ inputs.status == 'building' }}; then
           echo "status=🕑 *Building…*" >> $GITHUB_OUTPUT
           echo "color=null" >> $GITHUB_OUTPUT
         elif [ "${{ inputs.status }}" == "deploying" ]; then
