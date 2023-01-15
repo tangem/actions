@@ -51,10 +51,7 @@ jobs:
           echo "status=🟢 *Built and deployed*" >> $GITHUB_OUTPUT
           echo "color=green" >> $GITHUB_OUTPUT
         elif ${{ inputs.status == 'building_error' }}; then
-          echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
-          echo "color=red" >> $GITHUB_OUTPUT
-        elif ${{ inputs.status == 'deploying_error' }}; then
-          echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
+          echo "status=🔴 *Error occured*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
         fi
     - id: slack_message
