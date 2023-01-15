@@ -27,6 +27,9 @@ on:
       changelog:
         required: false
         type: string
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: true
 
 jobs:
   slack_notification:
