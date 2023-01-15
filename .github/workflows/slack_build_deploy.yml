@@ -30,7 +30,7 @@ on:
 
 jobs:
   slack_notification:
-    name: Slack Notification
+    name: Slack
     outputs:
       ts: ${{ steps.slack_message.outputs.ts }}
     runs-on: ubuntu-latest
