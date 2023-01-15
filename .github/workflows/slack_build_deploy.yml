@@ -53,7 +53,7 @@ jobs:
         elif [inputs.status == 'deploying_error'] then
           echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
-        fi
+        fi 
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
