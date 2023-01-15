@@ -15,7 +15,7 @@ on:
       app_name:
         required: true
         type: string
-      target_name:
+      deploy_to:
         required: true
         type: string
       version:
@@ -67,7 +67,7 @@ jobs:
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": "${{ inputs.app_name }} → ${{ inputs.target_name }}",
+                        "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
                         "emoji": true
                     }
                 },
