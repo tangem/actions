@@ -50,7 +50,7 @@ jobs:
         elif ${{ inputs.status == 'success' }}; then
           echo "status=🟢 *Built and deployed*" >> $GITHUB_OUTPUT
           echo "color=green" >> $GITHUB_OUTPUT
-        elif ${{ inputs.status == 'building_error' }}; then
+        elif ${{ inputs.status == 'error' }}; then
           echo "status=🔴 *Error occured*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
         fi
