@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Prepare statuses
-      id: status
+      id: statuses
       run: |
         read -r -d '' JSON << EOF
         {
@@ -78,7 +78,7 @@ jobs:
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "{STATUS}"
+                            "text": "${{ fromJSON(steps.statuses.outputs.JSON).${{ inputs.status }} }}"
                         }
                     ]
                 },
