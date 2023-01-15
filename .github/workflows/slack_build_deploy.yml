@@ -44,16 +44,16 @@ jobs:
         if ${{ inputs.status == 'building' }}; then
           echo "status=🕑 *Building…*" >> $GITHUB_OUTPUT
           echo "color=null" >> $GITHUB_OUTPUT
-        elif [ "${{ inputs.status }}" == "deploying" ]; then
+        elif ${{ inputs.status == 'deploying' }}; then
           echo "status=🕞 *Deploying…*" >> $GITHUB_OUTPUT
           echo "color=null" >> $GITHUB_OUTPUT
-        elif [ "${{ inputs.status }}" == "success" ]; then
+        elif ${{ inputs.status == 'success' }}; then
           echo "status=🟢 *Built and deployed*" >> $GITHUB_OUTPUT
           echo "color=green" >> $GITHUB_OUTPUT
-        elif [ "${{ inputs.status }}" == "building_error" ]; then
+        elif ${{ inputs.status == 'building_error' }}; then
           echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
-        elif [ "${{ inputs.status }}" == "deploying_error" ]; then
+        elif ${{ inputs.status == 'deploying_error' }}; then
           echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
         fi
