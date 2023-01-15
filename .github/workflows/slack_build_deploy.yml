@@ -76,7 +76,7 @@ jobs:
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "ST: ${{ steps.statuses.outputs.status }}"
+                            "text": "${{ steps.statuses.outputs.status }}"
                         }
                     ]
                 },
