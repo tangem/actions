@@ -61,7 +61,7 @@ jobs:
        update-ts: ${{ inputs.message_ts }}
        payload: |
         {
-            "text": "${{ inputs.app_name }} → ${{ inputs.target_name }}",
+            "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
             "blocks": [
                 {
                     "type": "header",
@@ -76,7 +76,7 @@ jobs:
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "${{ steps.statuses.outputs.status }}"
+                            "text": "ST: ${{ steps.statuses.outputs.status }}"
                         }
                     ]
                 },
@@ -110,7 +110,7 @@ jobs:
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "*Changelog:*\n${{ inputs.app_name }}"
+                        "text": "*Changelog:*\n${{ inputs.changelog }}"
                     }
                 },
                 {
