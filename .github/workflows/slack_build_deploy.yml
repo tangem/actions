@@ -6,13 +6,13 @@ on:
       message_ts:
         required: false
         type: string
+      status:
+        required: true
+        type: string
       app_name:
         required: true
         type: string
       target_name:
-        required: true
-        type: string
-      status:
         required: true
         type: string
       version:
@@ -32,31 +32,22 @@ jobs:
     - name: Prepare statuses
       id: statuses
       run: |
-        read -r -d '' JSON << EOF
-        {
-            "building": {
-                "status": "🕑 *Building…*",
-                "color": null
-            },
-            "deploying": {
-                "status": "🕞 *Deploying…*",
-                "color": null
-            },
-            "success": {
-                "status": "🟢 *Built and deployed*",
-                "color": "green"
-            },
-            "build_error": {
-                "status": "🔴 *Building error*",
-                "color": "red"
-            },
-            "deploy_error": {
-                "status": "🔴 *Deploying error*",
-                "color": "red"
-            }
-        }
-        EOF
-        echo "JSON=$(echo $JSON)" >> $GITHUB_OUTPUT 
+        if [inputs.status == 'building'] then
+          echo "status=🕑 *Building…*" >> $GITHUB_OUTPUT
+          echo "color=null" >> $GITHUB_OUTPUT
+        elif [inputs.status == 'deploying'] then
+          echo "status=🕞 *Deploying…*" >> $GITHUB_OUTPUT
+          echo "color=null" >> $GITHUB_OUTPUT
+        elif [inputs.status == 'success'] then
+          echo "status=🟢 *Built and deployed*" >> $GITHUB_OUTPUT
+          echo "color=green" >> $GITHUB_OUTPUT
+        elif [inputs.status == 'building_error'] then
+          echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
+          echo "color=red" >> $GITHUB_OUTPUT
+        elif [inputs.status == 'deploying_error'] then
+          echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
+          echo "color=red" >> $GITHUB_OUTPUT
+        fi
     - id: slack
       uses: slackapi/slack-github-action@v1.23.0
       with:
@@ -78,7 +69,7 @@ jobs:
                     "elements": [
                         {
                             "type": "mrkdwn",
-                            "text": "${{ fromJSON(steps.statuses.outputs.JSON).${{ inputs.status }} }}"
+                            "text": "${{ steps.statuses.outputs.status }}"
                         }
                     ]
                 },
