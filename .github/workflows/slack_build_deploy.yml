@@ -3,6 +3,9 @@ name: Slack build and delpoy notification
 on:
   workflow_call:
     inputs:
+      channel:
+        required: true
+        type: string
       message_ts:
         required: false
         type: string
@@ -26,7 +29,10 @@ on:
         type: string
 
 jobs:
-  triage:
+  slack_notification:
+    name: Slack Notification
+    outputs:
+      ts: ${{ steps.slack_message.outputs.ts }}
     runs-on: ubuntu-latest
     steps:
     - name: Prepare statuses
@@ -48,10 +54,11 @@ jobs:
           echo "status=🔴 *Building error*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
         fi
-    - id: slack
+    - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
-       channel-id: ${{ env.slack_channel }}
+       channel-id: ${{ inputs.channel }}
+       update-ts: ${{ inputs.message_ts }}
        payload: |
         {
             "text": "${{ inputs.app_name }} → ${{ inputs.target_name }}",
