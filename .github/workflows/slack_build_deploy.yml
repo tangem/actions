@@ -63,8 +63,8 @@ jobs:
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
-       channel-id: ${{ inputs.channel }}
-       update-ts: ${{ inputs.message_ts }}
+       channel-id: "${{ inputs.channel }}"
+       update-ts: "${{ inputs.message_ts }}"
        payload: |
         {
             "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
