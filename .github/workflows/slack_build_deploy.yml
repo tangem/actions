@@ -54,6 +54,7 @@ jobs:
           echo "status=🔴 *Error occured*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
         fi
+        
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
@@ -124,3 +125,8 @@ jobs:
         }
     env:
      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
+  
+    - name: Test
+      id: statuses
+      run: echo ${{ steps.slack_message.outputs.ts }}
+     
