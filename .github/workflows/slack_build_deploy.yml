@@ -128,5 +128,5 @@ jobs:
   
     - name: Test
       id: test
-      run: echo ${{ steps.slack_message.outputs.ts }}
+      run: echo "color=${{echo steps.slack_message.outputs.ts }}" >> $GITHUB_OUTPUT  
      
