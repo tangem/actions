@@ -36,6 +36,7 @@ jobs:
     name: Slack
     outputs:
       ts: ${{ steps.slack_message.outputs.ts }}
+      message_id: ${{ steps.message.outputs.id }}
     runs-on: ubuntu-latest
     steps:
     - name: Prepare statuses
@@ -126,7 +127,7 @@ jobs:
       env:
        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
   
-    - name: Test
-      id: test
-      run: echo "color=${{echo steps.slack_message.outputs.ts }}" >> $GITHUB_OUTPUT  
+    - name: Message ID
+      id: message
+      run: echo "id=${{echo steps.slack_message.outputs.ts }}" >> $GITHUB_OUTPUT  
      
