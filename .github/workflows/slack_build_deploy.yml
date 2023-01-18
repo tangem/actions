@@ -65,6 +65,68 @@ jobs:
       with:
        channel-id: "${{ inputs.channel }}"
        update-ts: "${{ inputs.message_ts }}"
-       payload: ${{echo vars.SLACK_JSON }}
+       payload: |
+        {
+            "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "context",
+                    "elements": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "${{ steps.statuses.outputs.status }}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Version:*\n${{ inputs.version }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Build number:*\n${{ inputs.build_number }}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Branch:*\n${{ github.ref_name }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Started by:*\n${{ github.actor }}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "*Changelog:*\n${{ inputs.changelog }}"
+                    }
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
+                    }
+                }
+            ]
+        }
       env:
        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
