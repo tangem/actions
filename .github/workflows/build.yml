@@ -26,6 +26,9 @@ on:
       changelog:
         required: false
         type: string
+      app_name: 
+        required: false
+        type: string
     
     secrets:
       SLACK_BOT_TOKEN:
@@ -39,7 +42,7 @@ on:
         value: ${{ jobs.slack_notification.outputs.ts }}
 
 env:
-  app_path: "fastlane/builds/app.ipa"
+  app_path: "fastlane/builds"
   artifact_name: Tangem App
 
 jobs:
@@ -139,6 +142,6 @@ jobs:
     - name: Upload binary artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.artifact_name }}
-        path: ${{ env.app_path }}
+        name: ${{ inputs.app_name }}
+        path: "${{ env.app_path }}/${{ inputs.app_name }}"
         if-no-files-found: error
