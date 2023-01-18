@@ -1,4 +1,4 @@
-name: Slack build and delpoy notification
+name: Build
 
 on:
   workflow_call:
@@ -13,7 +13,7 @@ on:
       title:
         required: true
         type: string
-      #alpha, beta, rc  
+      #Alpha, Beta, Rc  
       stage: 
         required: true
         type: string
@@ -43,8 +43,8 @@ env:
   artifact_name: Tangem App
 
 jobs:
-  Build:
-    name: Slack
+  build:
+    name: Build
     outputs:
       ts: ${{ steps.slack_message.outputs.ts }}
     runs-on: self-hosted
