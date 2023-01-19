@@ -63,13 +63,13 @@ jobs:
        update-ts: "${{ inputs.message_ts }}"
        payload: |
         {
-            "text": "${{ title }}",
+            "text": "${{ inputs.title }}",
             "blocks": [
                 {
                     "type": "header",
                     "text": {
                         "type": "plain_text",
-                        "text": "${{ title }}",
+                        "text": "${{ inputs.title }}",
                         "emoji": true
                     }
                 },
