@@ -41,7 +41,7 @@ on:
     outputs:
       ts:
         description: "Slack message ts"
-        value: ${{ jobs.slack_notification.outputs.ts }}
+        value: ${{ jobs.deploy.outputs.ts }}
 
 env:
   app_path: "fastlane/builds/app.ipa"
@@ -51,7 +51,7 @@ jobs:
   deploy:
     name: Deploy
     outputs:
-      ts: ${{ steps.slack_message.outputs.ts }}
+      ts: ${{ steps.slack_notification.outputs.ts }}
     runs-on: self-hosted
     environment: ${{ inputs.stage }}
     steps:
