@@ -1,0 +1,80 @@
+name: Slack build and delpoy notification
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        required: true
+        type: string
+    secrets:
+      SLACK_BOT_TOKEN:
+        required: true
+
+    outputs:
+      ts:
+        description: "Slack message ts"
+        value: ${{ jobs.slack_notification.outputs.ts }}
+
+jobs:
+  slack_notification:
+    name: Slack
+    outputs:
+      ts: ${{ steps.slack_message.outputs.ts }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+        token: ${{ secrets.GH_MOBILE_PAT }}
+        
+    - name: Bundle install
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
+      
+    - name: Tests
+      run: bundle exec fastlane test
+      
+    - name: Falure Slack notification
+      id: slack_message
+      if: failure()
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+       channel-id: "${{ inputs.channel }}"
+       payload: |
+        {
+            "text": "Tests failed",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": "Tests failed",
+                        "emoji": true
+                    }
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Branch:*\n${{ github.ref_name }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Started by:*\n${{ github.actor }}"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "mrkdwn",
+                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
+                    }
+                }
+            ]
+        }
+      env:
+       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
