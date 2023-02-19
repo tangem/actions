@@ -15,11 +15,11 @@ on:
     outputs:
       ts:
         description: "Slack message ts"
-        value: ${{ jobs.slack_notification.outputs.ts }}
+        value: ${{ jobs.test.outputs.ts }}
 
 jobs:
-  slack_notification:
-    name: Slack
+  tests:
+    name: Unit tests
     outputs:
       ts: ${{ steps.slack_message.outputs.ts }}
     runs-on: self-hosted
