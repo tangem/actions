@@ -9,6 +9,8 @@ on:
     secrets:
       SLACK_BOT_TOKEN:
         required: true
+      GH_MOBILE_PAT:
+        required: true
 
     outputs:
       ts:
