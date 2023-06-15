@@ -3,43 +3,27 @@ name: Build
 on:
   workflow_call:
     inputs:
-      #slack notification
-      channel:
-        required: true
-        type: string
-      message_ts:
-        required: false
-        type: string
-      title:
-        required: true
-        type: string
-      #Alpha, Beta, Rc  
+      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate 
+      # Alpha - Alpha build aka Feature build is built from a feature branch and will be deploied to Google Distribution
+      # Beta - Alpha build aka Development build is built from a develop branch and will be deploied to Google Distribution
+      # RC - RC build is built from release branch and will be deploied to the application stores 
       stage: 
         required: true
         type: string
+      # Version will be set to the app and will be shown in Google distribution, application store as well as inside the app.
+      # Versions can be either semantic (like 1.2.0) or Jira task key (IOS-123)
       version:
         required: true
         type: string
+      # Buld number must be unique and incremented every run
       build_number:
         required: true
         type: string
-      changelog:
-        required: false
-        type: string
-      app_name: 
-        required: false
-        type: string
     
     secrets:
-      SLACK_BOT_TOKEN:
-        required: true
+      # Token must have read access to all the submodule repositories
       GH_MOBILE_PAT:
         required: true
-
-    outputs:
-      ts:
-        description: "Slack message ts"
-        value: ${{ jobs.build.outputs.ts }}
 
 env:
   app_path: "fastlane/builds"
@@ -48,97 +32,28 @@ env:
 jobs:
   build:
     name: Build
-    outputs:
-      ts: ${{ steps.slack_notification.outputs.ts }}
     runs-on: self-hosted
     steps:
-    - name: Start building Slack message
-      id: slack_notification
-      uses: slackapi/slack-github-action@v1.23.0
-      with:
-       channel-id: "${{ inputs.channel }}"
-       update-ts: "${{ inputs.message_ts }}"
-       payload: |
-        {
-            "text": "${{ inputs.title }}",
-            "blocks": [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "${{ inputs.title }}",
-                        "emoji": true
-                    }
-                },
-                {
-                    "type": "context",
-                    "elements": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "🕑 *Building…*"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Version:*\n${{ inputs.version }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Build number:*\n${{ inputs.build_number }}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Branch:*\n${{ github.ref_name }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Started by:*\n${{ github.actor }}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*Changelog:*\n${{ inputs.changelog }}"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
-                    }
-                }
-            ]
-        }
-      env:
-       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
-       
+    # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
       run: rm -rf *
-
+    
+    # Check out git repositories and submodules.
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
-
+    
+    # Prepare enviroment with installing tools
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
-
+    
+    # Build app with Fastlane. Parameters: stage, build_number, version
     - name: Build
-      run: bundle exec fastlane alpha build:"${{ inputs.build_number }}" version:"${{ inputs.version }}"
-
+      run: bundle exec fastlane ${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}"
+    
+    # Upload artifact to be able to reuse in the following jobs 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v3
       with:
