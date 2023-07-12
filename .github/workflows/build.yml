@@ -19,6 +19,10 @@ on:
       build_number:
         required: true
         type: string
+      # Name that will be used for the artifact
+      app_name: 
+        required: true
+        type: string
     
     secrets:
       # Token must have read access to all the submodule repositories
@@ -51,7 +55,7 @@ jobs:
     
     # Build app with Fastlane. Parameters: stage, build_number, version
     - name: Build
-      run: bundle exec fastlane ${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}"
+      run: bundle exec fastlane ${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
     
     # Upload artifact to be able to reuse in the following jobs 
     - name: Upload binary artifact
