@@ -23,7 +23,7 @@ on:
       changelog:
         required: false
         type: string
-      # 
+      # Name that will be used for the artifact
       app_name: 
         required: true
         type: string
