@@ -52,15 +52,20 @@ jobs:
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
     
-    # Build app with Fastlane. Parameters: stage, build_number, version
+    # IF ALPHA: Build app with Fastlane. Parameters: stage, build_number, version
     - name: Make Internal build
-      if: ${{ inputs.stage }} == 'Alpha' ||  ${{ inputs.stage }} == 'Beta'
-      run: bundle exec fastlane build_internal build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
+      if: ${{ inputs.stage }} == 'Alpha'
+      run: bundle exec fastlane build_alpha build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
 
-    # Build app with Fastlane. Parameters: stage, build_number, version
+    # IF BETA: Build app with Fastlane. Parameters: stage, build_number, version
+    - name: Make Internal build
+      if: ${{ inputs.stage }} == 'Beta'
+      run: bundle exec fastlane build_beta build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
+
+    # IF RC: Build app with Fastlane. Parameters: stage, build_number, version
     - name: Make External build
       if: ${{ inputs.stage }} == 'RC'
-      run: bundle exec fastlane build_release build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
+      run: bundle exec fastlane build_rc build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
   
     # Upload artifact to be able to reuse in the following jobs 
     - name: Upload binary artifact
