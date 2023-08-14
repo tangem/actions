@@ -53,9 +53,15 @@ jobs:
       run: bundle install --jobs 4 --retry 3
     
     # Build app with Fastlane. Parameters: stage, build_number, version
-    - name: Build
-      run: bundle exec fastlane ${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
-    
+    - name: Make Internal build
+      if: ${{ inputs.stage }} == 'Alpha' ||  ${{ inputs.stage }} == 'Beta'
+      run: bundle exec fastlane internal_build build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
+
+    # Build app with Fastlane. Parameters: stage, build_number, version
+    - name: Make External build
+      if: ${{ inputs.stage }} == 'RC'
+      run: bundle exec fastlane release_build build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" app_name:"${{ inputs.app_name }}"
+  
     # Upload artifact to be able to reuse in the following jobs 
     - name: Upload binary artifact
       uses: actions/upload-artifact@v3
