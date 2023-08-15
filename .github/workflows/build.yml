@@ -59,12 +59,12 @@ jobs:
     # IF ALPHA: Build app with Fastlane. Parameters: stage, build_number, version
     - name: Make Internal build
       if: ${{ inputs.stage }} == 'Alpha'
-      run: bundle exec fastlane build_alpha build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" filename:"${{ inputs.filename }}"
+      run: bundle exec fastlane build_alpha build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" path:"${{ inputs.path }} filename:"${{ inputs.filename }}"
 
     # IF BETA: Build app with Fastlane. Parameters: stage, build_number, version
     - name: Make Internal build
       if: ${{ inputs.stage }} == 'Beta'
-      run: bundle exec fastlane build_beta build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" filename:"${{ inputs.filename }}"
+      run: bundle exec fastlane build_beta build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" path:"${{ inputs.path }} filename:"${{ inputs.filename }}"
 
     # IF RC: Build app with Fastlane. Parameters: stage, build_number, version
     - name: Make External build
