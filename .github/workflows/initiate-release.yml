@@ -1,0 +1,41 @@
+name: Initiate Release
+# This action creates 
+on:
+  workflow_call:
+    inputs:
+      versionName:
+        required: true
+        type: string
+      releaseType:
+        required: true
+        type: string
+        
+jobs:
+  createrelease:
+    name: Create release branch
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create release branch
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.git.createRef({
+            context.repo.owner,
+            context.repo.repo,
+            "refs/heads/${{ inputs.versionName }}/${{ inputs.versionName }}",
+            ${{ github.sha }},
+          });
+  
+    - name: Create Pull request to master
+      uses: actions/github-script@v4
+      with:
+        github-token: ${{secrets.GITHUB_TOKEN}}
+        script: |
+          github.pulls.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            head: "${{ inputs.versionName }}/${{ inputs.versionName }}",
+            base: "master",
+            title: "▶️ Release version ${{ github.event.inputs.versionName }}",
+          });
