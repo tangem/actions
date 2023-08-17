@@ -11,7 +11,7 @@ on:
         type: string
         
 jobs:
-  createrelease:
+  preparegit:
     name: Create release branch
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +23,7 @@ jobs:
           github.git.createRef({
             context.repo.owner,
             context.repo.repo,
-            "refs/heads/${{ inputs.versionName }}/${{ inputs.versionName }}",
+            "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
             ${{ github.sha }},
           });
   
@@ -35,7 +35,7 @@ jobs:
           github.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: "${{ inputs.versionName }}/${{ inputs.versionName }}",
+            head: "${{ inputs.releaseType }}/${{ inputs.versionName }}",
             base: "master",
             title: "▶️ Release version ${{ github.event.inputs.versionName }}",
           });
