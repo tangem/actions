@@ -1,4 +1,4 @@
-name: Deploy
+name: Firebase
 
 on:
   workflow_call:
@@ -47,10 +47,5 @@ jobs:
         path: artifacts/
        
     - name: Deploy to Firebase
-      if: ${{ inputs.stage == 'Alpha' ||  inputs.stage == 'Beta' }} 
       run: bundle exec fastlane deploy_firebase app_id:"${{ secrets.FIREBASE_APP_ID }}" path:"artifacts/${{ inputs.filename }}" firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" changelog:"${{inputs.changelog}}"
-   
-    - name: Deploy to Platform Application Store
-      if: ${{ inputs.stage == 'RC' }} 
-      run: bundle exec fastlane deploy_appstore
    
