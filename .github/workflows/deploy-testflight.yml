@@ -1,0 +1,51 @@
+name: Testflight
+
+on:
+  workflow_call:
+    inputs:
+      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate 
+      # Alpha - Alpha build aka Feature build is built from a feature branch and will be deploied to Google Distribution
+      # Beta - Alpha build aka Development build is built from a develop branch and will be deploied to Google Distribution
+      # RC - RC build is built from release branch and will be deploied to the application stores 
+      stage: 
+        required: true
+        type: string
+      # Version will be set to the app and will be shown in Google distribution, application store as well as inside the app.
+      # Versions can be either semantic (like 1.2.0) or Jira task key (IOS-123)
+      version:
+        required: true
+        type: string
+      # Buld number must be unique and incremented every run
+      build_number:
+        required: true
+        type: string
+      # (Optional) List of changes that will be shown in App Distribution or application store
+      changelog:
+        required: false
+        type: string
+      # Name that will be used for the artifact
+      filename: 
+        required: true
+        type: string
+    
+    secrets:
+      FIREBASE_APP_ID:
+        required: true
+      FIREBASE_CLI_TOKEN:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: self-hosted
+    environment: ${{ inputs.stage }}
+    steps:
+    - name: Download the artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ inputs.filename }}
+        path: artifacts/
+       
+    - name: Deploy to Firebase
+      run: bundle exec fastlane deploy_appstore app_id:"${{ secrets.FIREBASE_APP_ID }}" path:"artifacts/${{ inputs.filename }}" firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" changelog:"${{inputs.changelog}}"
+   
