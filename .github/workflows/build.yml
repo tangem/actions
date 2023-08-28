@@ -52,12 +52,6 @@ jobs:
     # Prepare enviroment with installing tools
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
-
-    - name: Test
-      run: |
-        export LANG=en_US.UTF-8
-        export LANGUAGE=en_US.UTF-8
-        export LC_ALL=en_US.UTF-8
     
     # IF ALPHA: Build app with Fastlane. Parameters: stage, build_number, version
     - name: Make Alpha build
