@@ -36,7 +36,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: self-hosted
+    runs-on: [self-hosted, active]
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
