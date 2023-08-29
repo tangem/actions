@@ -33,6 +33,9 @@ on:
         required: true
       FIREBASE_CLI_TOKEN:
         required: true
+      # Token must have read access to all the submodule repositories
+      GH_MOBILE_PAT:
+        required: true
 
 jobs:
   deploy:
@@ -40,6 +43,17 @@ jobs:
     runs-on: self-hosted
     environment: ${{ inputs.stage }}
     steps:
+    # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
+    - name: Clean
+      run: rm -rf *
+    
+    # Check out git repositories and submodules to get fatslane instructions 
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+        token: ${{ secrets.GH_MOBILE_PAT }}
+        
     - name: Download the artifact
       uses: actions/download-artifact@v3
       with:
