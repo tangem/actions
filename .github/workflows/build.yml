@@ -53,8 +53,8 @@ jobs:
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
     
-    # IF ALPHA: Build app with Fastlane. Parameters: stage, build_number, version
-    - name: Make Alpha build
+    # Build the app
+    - name: Build
       run: bundle exec fastlane build_${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" path:"${{ inputs.path }}" filename:"${{ inputs.filename }}"
 
     # Upload artifact to be able to reuse in the following jobs 
