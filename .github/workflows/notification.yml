@@ -96,6 +96,10 @@ jobs:
                         {
                             "type": "mrkdwn",
                             "text": "*Build number:*\n${{ inputs.build_number }}"
+                        },
+                        {
+                            "type": "mrkdwn",
+                            "text": "*Commmit:*\n${{ github.sha }}"
                         }
                     ]
                 },
