@@ -59,6 +59,15 @@ jobs:
           echo "status=🔴 *Error occured*" >> $GITHUB_OUTPUT
           echo "color=red" >> $GITHUB_OUTPUT
         fi
+
+    - name: Prepare changelog
+      id: changelog
+      run: |
+        CHANGELOG=${{ inputs.changelog }
+        CHANGELOG="${CHANGELOG//'%'/'%25'}"
+        CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
+        CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+        echo "::set-output name=text::$CHANGELOG"
         
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
@@ -120,7 +129,7 @@ jobs:
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": "*Changelog:*\n${{ inputs.changelog }}"
+                        "text": "*Changelog:*\n${{ steps.changelog.outputs.text }}"
                     }
                 },
                 {
