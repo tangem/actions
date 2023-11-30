@@ -29,9 +29,14 @@ on:
         type: string
     
     secrets:
-      FIREBASE_APP_ID:
+      # App Store Connect Key ID
+      ASC_KEY_ID:
         required: true
-      FIREBASE_CLI_TOKEN:
+      # App Store Issuer ID
+      ASC_ISSUER_ID:
+        required: true
+      # App Store Connect Key
+      ASC_KEY:
         required: true
       # Token must have read access to all the submodule repositories
       GH_MOBILE_PAT:
@@ -59,7 +64,7 @@ jobs:
       with:
         name: ${{ inputs.filename }}
         path: artifacts/
-       
-    - name: Deploy to Firebase
-      run: bundle exec fastlane deploy_appstore app_id:"${{ secrets.FIREBASE_APP_ID }}" path:"artifacts/${{ inputs.filename }}" firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" changelog:"${{inputs.changelog}}"
+    
+    - name: Deploy to Testflight
+      run: bundle exec fastlane deploy_testflight asc_key_id:"${{ secrets.ASC_KEY_ID }}" asc_issuer_id:"${{ secrets.ASC_ISSUER_ID }}" asc_key:"${{ secrets.ASC_KEY }}" path:"artifacts/${{ inputs.filename }}" changelog:"${{inputs.changelog}}"
    
