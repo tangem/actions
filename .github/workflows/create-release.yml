@@ -26,6 +26,36 @@ jobs:
             "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
             ${{ github.sha }},
           });
+
+    - name: Get unreleased tasks
+      id: git-diff
+      uses: tangem/github-action@main
+      with:
+        github-token: ${{ secrets.GH_MOBILE_PAT}}
+        base: "master"
+        head: "${{ inputs.releaseType }}/${{ inputs.versionName }}"
+
+    - name: Jira Login
+      uses: atlassian/gajira-login@master
+      env:
+        JIRA_BASE_URL: ${{ secrets.JIRA_URL }}
+        JIRA_USER_EMAIL: ${{ secrets.JIRA_USER }}
+        JIRA_API_TOKEN: ${{ secrets.JIRA_TOKEN }}
+      
+    - name: Jira Get Issues Summary
+      uses: tangem/jira-action@master
+      id: changelog
+      with:
+        action: getIssuesSummary
+        issues: ${{ steps.git-diff.outputs.issues }}
+
+    - name: Jira Set Version To Issues
+      uses: tangem/jira-action@master
+      with:
+       action: setVersionToIssues
+       project: IOS
+       version: "Next Release"
+       issues: ${{ steps.git-diff.outputs.issues }}
   
     - name: Create Pull request to master
       uses: actions/github-script@v4
