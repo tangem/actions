@@ -1,4 +1,4 @@
-name: Initiate Release
+name: Prepare Release
 # This action creates 
 on:
   workflow_call:
@@ -18,11 +18,14 @@ on:
         required: true
         
 jobs:
-  preparegit:
+  prepare:
     name: Create release branch
     runs-on: ubuntu-latest
     outputs:
       changelog: ${{ steps.changelog.outputs.result }}
+      version: ${{ steps.jira.outputs.key }}
+      stage: "RC"
+      build_number: ${{ github.run_number }}
     steps:
     - name: Create release branch
       uses: actions/github-script@v4
