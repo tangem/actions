@@ -10,6 +10,8 @@ on:
         required: true
         type: string
     secrets:
+      GH_MOBILE_PAT:
+        required: true
       JIRA_BASE_URL:
         required: true
       JIRA_USER_EMAIL:
@@ -72,7 +74,7 @@ jobs:
     - name: Create Pull request to master
       uses: actions/github-script@v4
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{secrets.GH_MOBILE_PAT}}
         script: |
           github.pulls.create({
             owner: context.repo.owner,
