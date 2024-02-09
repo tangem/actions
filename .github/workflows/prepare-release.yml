@@ -38,7 +38,7 @@ jobs:
             context.repo.owner,
             context.repo.repo,
             "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
-            ${{ github.sha }},
+            ${{ github.sha }}
           });
 
     - name: Jira Login
