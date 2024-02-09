@@ -35,10 +35,10 @@ jobs:
         github-token: ${{secrets.GITHUB_TOKEN}}
         script: |
           github.git.createRef({
-            context.repo.owner,
-            context.repo.repo,
-            "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
-            ${{ github.sha }}
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
+            sha: ${{ github.sha }}
           });
 
     - name: Jira Login
