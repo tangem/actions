@@ -64,7 +64,7 @@ jobs:
           github.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: "${{ inputs.releaseType }}/${{ inputs.versionName }}",
+            head: "${{ inputs.releaseType }}s/${{ inputs.versionName }}",
             base: "master",
             title: "▶️ Release version ${{ github.event.inputs.versionName }}",
           });
