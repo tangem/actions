@@ -38,8 +38,8 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             ref: "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
-            sha: ${{ github.sha }}
-          });
+            sha: context.sha
+          })
 
     - name: Jira Login
       uses: atlassian/gajira-login@master
