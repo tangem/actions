@@ -37,7 +37,7 @@ jobs:
           github.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: "refs/heads/${{ inputs.releaseType }}s/${{ inputs.versionName }}",
+            ref: "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
             sha: context.sha
           })
 
@@ -64,7 +64,7 @@ jobs:
           github.pulls.create({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            head: "${{ inputs.releaseType }}s/${{ inputs.versionName }}",
+            head: "${{ inputs.releaseType }}/${{ inputs.versionName }}",
             base: "master",
             title: "▶️ Release version ${{ github.event.inputs.versionName }}",
           });
