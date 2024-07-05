@@ -59,9 +59,7 @@ jobs:
         id: build-image
         uses: docker/build-push-action@v6
         with:
-          platforms:  
-            - linux/arm64
-            - linux/amd64
+          platforms: linux/arm64,linux/amd64
           context: .
           push: true
           tags: |
