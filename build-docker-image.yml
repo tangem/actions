@@ -19,6 +19,10 @@ on:
       OIDC_ROLE_ARN:
         type: string
         required: true
+    outputs:
+      image:
+        description: Full AWS ECR image
+        value: ${{ steps.login-ecr.outputs.registry}}/${{ inputs.docker-repository }}
 
 concurrency:
   group: ${{ github.ref }}
