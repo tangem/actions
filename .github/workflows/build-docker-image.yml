@@ -21,7 +21,7 @@ on:
     outputs:
       image:
         description: Full AWS ECR image
-        value: ${{ steps.login-ecr.outputs.registry}}/${{ inputs.docker-repository }}
+        value: ${{ jobs.login-ecr.outputs.registry}}/${{ inputs.docker-repository }}
 
 concurrency:
   group: ${{ github.ref }}
