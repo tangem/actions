@@ -1,0 +1,102 @@
+name: Semantic release analysis
+
+on:
+  workflow_call:
+    outputs:
+      release:
+        description: Boolean output indicate if there was a new release
+        value: ${{ jobs.release-analysis.outputs.release }}
+      release-version:
+        description: Release version
+        value: ${{ jobs.release-analysis.outputs.release-version }}
+
+jobs:
+  release-analysis:
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.semantic.outputs.new_release_published }}
+      release-version: ${{ steps.semantic.outputs.new_release_version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure
+        uses: devops-actions/json-to-file@v1.0.3
+        with:
+          json: |
+            {
+              "branches": [
+                "main",
+                "+([0-9])?(.{+([0-9]),x}).x",
+                { "name":  "stage", "channel": "rc", "prerelease": true },
+                { "name":  "dev", "channel": "dev", "prerelease": true }
+              ],
+              "plugins": [
+                [
+                  "@semantic-release/commit-analyzer",
+                  {
+                    "preset": "angular",
+                    "releaseRules": [
+                      {"type": "docs", "release": "minor"},
+                      {"type": "refactor", "release": "minor"},
+                      {"type": "fix", "release": "patch"},
+                      {"type": "style", "release": "minor"},
+                      {"type": "feature", "release": "minor"},
+                      {"type": "feat", "release": "minor"},
+                      {"type": "chore", "release": "minor"},
+                      {"type": "build", "release": "minor"},
+                      {"type": "ci", "release": "minor"},
+                      {"type": "test", "release": "minor"},
+                      {"type": "perf", "release": "minor"}
+                    ],
+                    "parserOpts": {
+                      "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+                    }
+                  }
+                ],
+                [
+                  "@semantic-release/release-notes-generator",
+                  {
+                    "preset": "conventionalcommits",
+                    "parserOpts": {
+                      "issuePrefixes": "[A-Z]+\\-",
+                      "issuePrefixesCaseSensitive": true
+                    },
+                    "presetConfig": {
+                      "commitUrlFormat": "{{host}}/{{owner}}/{{repository}}/commits/{{hash}}",
+                      "compareUrlFormat": "{{host}}/{{owner}}/{{repository}}/compare/{{currentTag}}%0D{{previousTag}}#diff",
+                      "issueUrlFormat": "https://tangem.atlassian.net/browse/{{prefix}}{{id}}"
+                    }
+                  }
+                ],
+                [
+                  "@semantic-release/github",
+                  {
+                    "successComment": false,
+                    "failComment": false
+                  }
+                ]
+              ]
+            }
+          filename: ".releaserc.json"
+
+      - name: Semantic Release
+        uses: cycjimmy/semantic-release-action@v4
+        id: semantic
+        with:
+          extra_plugins: |
+            @semantic-release/git
+            @semantic-release/github
+            @semantic-release/release-notes-generator
+            @commitlint/config-conventional
+            @commitlint/cli
+        env:
+          DEBUG: 'semantic-release:*'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
