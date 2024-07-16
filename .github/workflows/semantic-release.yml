@@ -72,7 +72,7 @@ jobs:
                     "presetConfig": {
                       "commitUrlFormat": "{{host}}/{{owner}}/{{repository}}/commits/{{hash}}",
                       "compareUrlFormat": "{{host}}/{{owner}}/{{repository}}/compare/{{currentTag}}%0D{{previousTag}}#diff",
-                      "issueUrlFormat": "https://welkinhealth.atlassian.net/browse/{{prefix}}{{id}}"
+                      "issueUrlFormat": "https://tangem.atlassian.net/browse/{{prefix}}{{id}}"
                     }
                   }
                 ],
