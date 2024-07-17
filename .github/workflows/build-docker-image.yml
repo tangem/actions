@@ -21,7 +21,7 @@ on:
     outputs:
       image:
         description: Full AWS ECR image
-        value: ${{ jobs.login-ecr.outputs.registry}}/${{ inputs.docker-repository }}
+        value: ${{ jobs.build.outputs.registry}}/${{ inputs.docker-repository }}
 
 concurrency:
   group: ${{ github.ref }}
@@ -34,6 +34,8 @@ jobs:
   build:
     name: Build docker image
     runs-on: ubuntu-latest
+    outputs:
+      registry: ${{ steps.login-ecr.outputs.registry }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
