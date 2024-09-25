@@ -94,7 +94,6 @@ jobs:
           extra_plugins: |
             @semantic-release/git
             @semantic-release/github
-            @semantic-release/release-notes-generator
             @commitlint/config-conventional
             @commitlint/cli
         env:
