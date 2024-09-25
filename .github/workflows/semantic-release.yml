@@ -66,7 +66,7 @@ jobs:
                   {
                     "preset": "conventionalcommits",
                     "parserOpts": {
-                      "issuePrefixes": "[A-Z]+\\-",
+                      "issuePrefixes": ["[A-Z]+\\-"],
                       "issuePrefixesCaseSensitive": true
                     },
                     "presetConfig": {
