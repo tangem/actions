@@ -59,7 +59,7 @@ jobs:
       run: bundle install --jobs 4 --retry 3
         
     - name: Download the artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4.1.7
       with:
         name: ${{ inputs.filename }}
         path: artifacts/
