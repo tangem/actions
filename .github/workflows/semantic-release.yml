@@ -97,6 +97,7 @@ jobs:
             @semantic-release/release-notes-generator
             @commitlint/config-conventional
             @commitlint/cli
+            conventional-changelog-conventionalcommits@8.0.0
         env:
           DEBUG: 'semantic-release:*'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
