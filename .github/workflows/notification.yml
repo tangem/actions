@@ -64,9 +64,8 @@ jobs:
       id: changelog
       run: |
         CHANGELOG="${{ inputs.changelog }}"
-        CHANGELOG="${CHANGELOG//'%'/'%25'}"
-        CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
-        CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"
+        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
         
     - id: slack_message
