@@ -67,7 +67,7 @@ jobs:
         CHANGELOG="${CHANGELOG//'%'/'%25'}"
         CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
         CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
-        echo "::set-output name=text::$CHANGELOG"
+        echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
         
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
