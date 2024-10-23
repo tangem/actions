@@ -27,6 +27,10 @@ on:
       path: 
         required: true
         type: string
+      # Optional Xcode version override. Leave blank (default value) to use the default Xcode version; 
+      # Pass a custom value (e.g. '16.0', '10.2.1', '11 Beta 7', '11.2 GM seed', etc) to use a different Xcode version for the build
+      xcode_version_override:
+        type: string
     
     secrets:
       # Token must have read access to all the submodule repositories
@@ -55,7 +59,14 @@ jobs:
     
     # Build the app
     - name: Build
-      run: bundle exec fastlane build_${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" path:"${{ inputs.path }}" filename:"${{ inputs.filename }}"
+      run: |
+        bundle exec fastlane \
+        build_${{ inputs.stage }} \
+        build:"${{ inputs.build_number }}" \
+        version:"${{ inputs.version }}" \
+        path:"${{ inputs.path }}" \
+        filename:"${{ inputs.filename }}" \
+        xcode_version_override:"${{ inputs.xcode_version_override }}"
 
     # Upload artifact to be able to reuse in the following jobs 
     - name: Upload binary artifact
