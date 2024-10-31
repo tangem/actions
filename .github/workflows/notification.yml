@@ -63,9 +63,18 @@ jobs:
     - name: Prepare changelog
       id: changelog
       run: |
-        CHANGELOG="${{ inputs.changelog }}"
-        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"
-        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"
+        # Workaround for handling a multi-line text with control characters in Bash
+        CHANGELOG=$(cat <<'EOF'
+        ${{ inputs.changelog }}
+        EOF
+        )
+
+        CHANGELOG="${CHANGELOG//\\/\\\\}"     # Escape backslashes
+        CHANGELOG="${CHANGELOG//\"/\\\"}"     # Escape double quotes
+        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"  # Escape newlines
+        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"  # Escape carriage returns
+        CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs
+
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
         
     - id: slack_message
