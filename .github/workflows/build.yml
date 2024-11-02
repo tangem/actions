@@ -56,7 +56,13 @@ jobs:
     # Prepare enviroment with installing tools
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
-    
+
+    - name: Debug
+      run: |
+        security find-identity -p codesigning -v
+        echo `defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
+        defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists
+
     # Build the app
     - name: Build
       run: |
