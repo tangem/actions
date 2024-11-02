@@ -63,6 +63,22 @@ jobs:
       with:
         name: ${{ inputs.filename }}
         path: artifacts/
+
+    - name: Prepare changelog
+      id: changelog
+      run: |
+        # Workaround for handling a multi-line text with control characters in Bash
+        CHANGELOG=$(cat <<'EOF'
+        "${{ inputs.changelog }}"
+        EOF
+        )
+
+        CHANGELOG="${{ inputs.changelog }}"
+        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"  # Escape newlines (required by GA)
+        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"  # Escape carriage returns (required by GA)
+        CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs (required by GA)
+
+        echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
        
     - name: Deploy to Firebase
       run: |
@@ -71,5 +87,5 @@ jobs:
         app_id:"${{ secrets.FIREBASE_APP_ID }}" \
         path:"artifacts/${{ inputs.filename }}" \
         firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" \
-        changelog:'"${{ inputs.changelog }}"' \
+        changelog:"${{ steps.changelog.outputs.text }}" \
         --verbose # TODO: debug, remove
