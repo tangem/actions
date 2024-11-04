@@ -56,7 +56,13 @@ jobs:
     # Prepare enviroment with installing tools
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
-    
+
+    # Various code-signing info, do not remove
+    - name: Code signing debug output
+        run: |
+          echo "Codesigning identities:\n`security find-identity -p codesigning -v`"
+          echo "DVTDeveloperAccountManagerAppleIDLists content:\n`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`"
+
     # Build the app
     - name: Build
       run: |
