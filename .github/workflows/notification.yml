@@ -69,11 +69,11 @@ jobs:
         EOF
         )
 
-        CHANGELOG="${CHANGELOG//\\/\\\\}"     # Escape backslashes
-        CHANGELOG="${CHANGELOG//\"/\\\"}"     # Escape double quotes
-        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"  # Escape newlines
-        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"  # Escape carriage returns
-        CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs
+        CHANGELOG="${CHANGELOG//\\/\\\\}"     # Escape backslashes (required by JSON format)
+        CHANGELOG="${CHANGELOG//\"/\\\"}"     # Escape double quotes (required by JSON format)
+        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"  # Escape newlines (required by GA)
+        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"  # Escape carriage returns (required by GA)
+        CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs (required by GA)
 
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
         
