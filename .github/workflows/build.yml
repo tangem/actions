@@ -59,9 +59,9 @@ jobs:
 
     # Various code-signing info, do not remove
     - name: Code signing debug output
-        run: |
-          echo "Codesigning identities:\n`security find-identity -p codesigning -v`"
-          echo "DVTDeveloperAccountManagerAppleIDLists content:\n`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`"
+      run: |
+        echo "Codesigning identities:\n`security find-identity -p codesigning -v`"
+        echo "DVTDeveloperAccountManagerAppleIDLists content:\n`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`"
 
     # Build the app
     - name: Build
