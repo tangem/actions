@@ -76,7 +76,7 @@ jobs:
         CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs (required by GA)
 
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
-        
+
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
