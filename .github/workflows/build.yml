@@ -62,6 +62,8 @@ jobs:
       run: |
         echo "Codesigning identities:"$'\n'`security find-identity -p codesigning -v`
         echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
+        ls -ltrah /Users/builder1/Library/MobileDevice/Provisioning\ Profiles
+        ls -ltrah /Users/builder1/Library/Developer/Xcode/UserData/Provisioning\ Profiles
 
     # Build the app
     - name: Build
