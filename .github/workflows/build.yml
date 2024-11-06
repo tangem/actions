@@ -64,6 +64,7 @@ jobs:
         echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
         ls -ltrah /Users/builder1/Library/MobileDevice/Provisioning\ Profiles || true
         ls -ltrah /Users/builder1/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
+        find /Users/builder1/Library/MobileDevice/Provisioning\ Profiles -name '*.mobileprovision' -exec security cms -D -i {} \; | grep -i "name" -A 1
 
     # Build the app
     - name: Build
