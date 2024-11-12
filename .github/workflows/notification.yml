@@ -27,6 +27,10 @@ on:
       changelog:
         required: false
         type: string
+      # (Optional) Additional info about the build
+      build_description:
+        required: false
+        type: string
     secrets:
       SLACK_BOT_TOKEN:
         required: true
