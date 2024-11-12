@@ -52,7 +52,7 @@ jobs:
     runs-on: [self-hosted,active]
     environment: ${{ inputs.stage }}
     outputs:
-      encoded_release_url: ${{ steps.deploy_to_firebase.outputs.encoded_release_url }}
+      encoded_release_url: ${{ env.encoded_release_url }}
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
@@ -76,7 +76,6 @@ jobs:
         path: artifacts/
 
     - name: Deploy to Firebase
-      id: deploy_to_firebase
       env:
         RAW_CHANGELOG: '${{ inputs.changelog }}'
         BUILD_DESCRIPTION: '${{ inputs.build_description }}'
@@ -110,3 +109,9 @@ jobs:
         path:"artifacts/${{ inputs.filename }}" \
         firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" \
         changelog:"${CHANGELOG}"
+
+    - name: Debug output
+      env:
+        DEBUG_OUTPUT: '${{ env.encoded_release_url }}'
+      run: |
+        echo "DEBUG_OUTPUT: ${DEBUG_OUTPUT}"
