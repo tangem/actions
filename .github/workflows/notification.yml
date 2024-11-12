@@ -112,8 +112,8 @@ jobs:
           # See https://github.com/orgs/community/discussions/13082#discussioncomment-6776428 for details
           RELEASE_URL=$(echo "${ENCODED_RELEASE_URL}" | base64 --decode | base64 --decode)
         else
-          # Fallback to the default dummy value
-          RELEASE_URL="about:blank"
+          # Fallback to the default value
+          RELEASE_URL="https://appdistribution.firebase.google.com/testerapps"
         fi
 
         echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
