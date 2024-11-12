@@ -89,8 +89,6 @@ jobs:
           RAW_CHANGELOG="N/A"
         fi
 
-        CHANGELOG=""
-
         if [[ -n "${BUILD_DESCRIPTION}" ]]; then
         # Workaround for handling a multi-line text with control characters in Bash
         # The lack of indentation within the `if-fi` scope is intentional, do not fix it
