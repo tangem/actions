@@ -81,6 +81,23 @@ jobs:
 
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
 
+    - name: Prepare build description
+      id: build_description
+      run: |
+        BUILD_DESCRIPTION="N/A"
+
+        if [[ -n "${{ inputs.build_description }}" ]]; then
+          BUILD_DESCRIPTION="${{ inputs.build_description }}"
+        fi
+
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//\\/\\\\}"     # Escape backslashes (required by JSON format)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//\"/\\\"}"     # Escape double quotes (required by JSON format)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\n'/'\n'}"  # Escape newlines (required by GA)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\r'/'\r'}"  # Escape carriage returns (required by GA)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\t'/'\t'}"  # Escape tabs (required by GA)
+
+        echo "text=$BUILD_DESCRIPTION" >> $GITHUB_OUTPUT
+
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
@@ -136,6 +153,13 @@ jobs:
                               "text": "*Started by:*\n${{ github.actor }}"
                           }
                       ]
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "*Additional description:*\n${{ steps.build_description.outputs.text }}"
+                      }
                   },
                   {
                       "type": "section",
