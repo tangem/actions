@@ -31,6 +31,10 @@ on:
       build_description:
         required: false
         type: string
+      # (Optional) Encoded Firebase URL for the uploaded release
+      encoded_release_url:
+        required: false
+        type: string
     secrets:
       SLACK_BOT_TOKEN:
         required: true
@@ -97,6 +101,22 @@ jobs:
         BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\t'/'\t'}"  # Escape tabs (required by GA)
 
         echo "text=$BUILD_DESCRIPTION" >> $GITHUB_OUTPUT
+
+    - name: Decode Firebase release URL
+      id: decode_release_url
+      run: |
+        ENCODED_RELEASE_URL="${{ inputs.encoded_release_url }}"
+
+        if [[ -n "${ENCODED_RELEASE_URL}" ]]; then
+          # Decoding string encoded twice using base64 encoding
+          # See https://github.com/orgs/community/discussions/13082#discussioncomment-6776428 for details
+          RELEASE_URL=$(echo "${ENCODED_RELEASE_URL}" | base64 --decode | base64 --decode)
+        else
+          # Fallback to the default dummy value
+          RELEASE_URL="about:blank"
+        fi
+
+        echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
 
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
@@ -172,7 +192,14 @@ jobs:
                       "type": "section",
                       "text": {
                           "type": "mrkdwn",
-                          "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
+                          "text": "<${{ steps.decode_release_url.outputs.release_url }}|:calling: Install this release using Firebase>"
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|:hammer_and_wrench: View this action on GitHub>"
                       }
                   }
               ]
