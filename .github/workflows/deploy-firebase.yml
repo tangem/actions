@@ -32,6 +32,11 @@ on:
         required: true
         type: string
 
+    outputs:
+      encoded_release_url:
+        description: "Encoded Firebase URL for the uploaded release"
+        value: ${{ jobs.deploy.outputs.encoded_release_url }}
+
     secrets:
       FIREBASE_APP_ID:
         required: true
@@ -46,6 +51,8 @@ jobs:
     name: Deploy
     runs-on: [self-hosted,active]
     environment: ${{ inputs.stage }}
+    outputs:
+      encoded_release_url: ${{ steps.deploy_to_firebase.outputs.encoded_release_url }}
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
@@ -69,6 +76,7 @@ jobs:
         path: artifacts/
 
     - name: Deploy to Firebase
+      id: deploy_to_firebase
       env:
         RAW_CHANGELOG: '${{ inputs.changelog }}'
         BUILD_DESCRIPTION: '${{ inputs.build_description }}'
