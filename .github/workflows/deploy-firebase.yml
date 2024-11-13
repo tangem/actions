@@ -23,10 +23,19 @@ on:
       changelog:
         required: false
         type: string
+      # (Optional) Additional info about the build
+      build_description:
+        required: false
+        type: string
       # Name that will be used for the artifact
       filename:
         required: true
         type: string
+
+    outputs:
+      encoded_release_url:
+        description: "Encoded Firebase URL for the uploaded release"
+        value: ${{ jobs.deploy.outputs.encoded_release_url }}
 
     secrets:
       FIREBASE_APP_ID:
@@ -42,6 +51,8 @@ jobs:
     name: Deploy
     runs-on: [self-hosted,active]
     environment: ${{ inputs.stage }}
+    outputs:
+      encoded_release_url: ${{ env.encoded_release_url }}
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
@@ -65,13 +76,30 @@ jobs:
         path: artifacts/
 
     - name: Deploy to Firebase
+      env:
+        RAW_CHANGELOG: '${{ inputs.changelog }}'
+        BUILD_DESCRIPTION: '${{ inputs.build_description }}'
       run: |
         # Changelog is prepared here inline instead of a separate step due to
         # an issue with passing multi-line strings between GA steps
-        #
+
+        # Fallback if there is no changelog info; e.g. when there is no Jira task associated with the branch
+        if [[ "${RAW_CHANGELOG}" =~ ^[[:space:]]*$ ]]; then
+          RAW_CHANGELOG="N/A"
+        fi
+
+        if [[ -n "${BUILD_DESCRIPTION}" ]]; then
         # Workaround for handling a multi-line text with control characters in Bash
-        CHANGELOG=$(cat <<'EOF'
-        ${{ inputs.changelog }}
+        # The lack of indentation within the `if-fi` scope is intentional, do not fix it
+        CHANGELOG+=$(cat <<EOF
+        Description: ${BUILD_DESCRIPTION}
+        EOF
+        )$'\n'
+        fi
+
+        # Workaround for handling a multi-line text with control characters in Bash
+        CHANGELOG+=$(cat <<EOF
+        Changelog: ${RAW_CHANGELOG}
         EOF
         )
 
