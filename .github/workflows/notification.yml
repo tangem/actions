@@ -87,7 +87,7 @@ jobs:
 
         # Slack API has a limit for the max length of the section, 3000 characters max, truncating if needed
         if [[ ${#CHANGELOG} -gt $SLACK_MESSAGE_SECTION_MAX_LENGTH ]]; then
-          CHANGELOG="${CHANGELOG:0:$SLACK_MESSAGE_SECTION_MAX_LENGTH}\n(truncated)...'"
+          CHANGELOG="${CHANGELOG:0:$SLACK_MESSAGE_SECTION_MAX_LENGTH}\n(truncated)..."
         fi
 
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
