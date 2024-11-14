@@ -110,6 +110,7 @@ jobs:
         firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" \
         changelog:"${CHANGELOG}"
 
+    # TODO: Remove
     - name: Debug output
       env:
         DEBUG_OUTPUT: '${{ env.encoded_release_url }}'
