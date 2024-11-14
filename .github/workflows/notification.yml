@@ -72,6 +72,7 @@ jobs:
       id: changelog
       env:
         CHANGELOG: '${{ inputs.changelog }}'
+        SLACK_MESSAGE_SECTION_MAX_LENGTH: 2950
       run: |
         # Fallback if there is no changelog info; e.g. when there is no Jira task associated with the branch
         if [[ "${CHANGELOG}" =~ ^[[:space:]]*$ ]]; then
@@ -83,6 +84,11 @@ jobs:
         CHANGELOG="${CHANGELOG//$'\n'/'\n'}"  # Escape newlines (required by GA)
         CHANGELOG="${CHANGELOG//$'\r'/'\r'}"  # Escape carriage returns (required by GA)
         CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs (required by GA)
+
+        # Slack API has a limit for the max length of the section, 3000 characters max, truncating if needed
+        if [[ ${#CHANGELOG} -gt $SLACK_MESSAGE_SECTION_MAX_LENGTH ]]; then
+          CHANGELOG="${CHANGELOG:0:$SLACK_MESSAGE_SECTION_MAX_LENGTH}\n(truncated)...'"
+        fi
 
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
 
