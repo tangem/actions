@@ -70,16 +70,12 @@ jobs:
 
     - name: Prepare changelog
       id: changelog
+      env:
+        CHANGELOG: '${{ inputs.changelog }}'
       run: |
-        CHANGELOG="N/A"
-
-        if [[ -n "${{ inputs.changelog }}" ]]; then
-        # Workaround for handling a multi-line text with control characters in Bash
-        # The lack of indentation within the `if-fi` scope is intentional, do not fix it
-        CHANGELOG=$(cat <<'EOF'
-        ${{ inputs.changelog }}
-        EOF
-        )
+        # Fallback if there is no changelog info; e.g. when there is no Jira task associated with the branch
+        if [[ "${CHANGELOG}" =~ ^[[:space:]]*$ ]]; then
+          CHANGELOG="N/A"
         fi
 
         CHANGELOG="${CHANGELOG//\\/\\\\}"     # Escape backslashes (required by JSON format)
