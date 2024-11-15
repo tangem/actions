@@ -22,7 +22,7 @@ jobs:
     name: Unit tests
     outputs:
       ts: ${{ steps.slack_message.outputs.ts }}
-    runs-on: [self-hosted,old]
+    runs-on: [self-hosted, builder2]
     steps:
     - name: Checkout
       uses: actions/checkout@v3
