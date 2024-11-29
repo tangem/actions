@@ -55,7 +55,12 @@ jobs:
 
     # Prepare enviroment with installing tools
     - name: Bundle install
-      run: bundle install --jobs 4 --retry 3
+      run: |
+        ruby --version || true
+        gem --version || true
+        bundle --version || true
+        bundle exec pod --version || true
+        bundle install --jobs 4 --retry 3
 
     # Various code-signing info, do not remove
     - name: Code signing debug output
