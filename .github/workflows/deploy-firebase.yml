@@ -67,7 +67,6 @@ jobs:
 
     # Prepare enviroment with installing tools
     - name: Bundle install
-      if: false
       run: bundle install --jobs 4 --retry 3
 
     - name: Download the artifact
@@ -81,9 +80,6 @@ jobs:
         RAW_CHANGELOG: '${{ inputs.changelog }}'
         BUILD_DESCRIPTION: '${{ inputs.build_description }}'
       run: |
-        # `source` is crucial since we're modifying env vars like `PATH` in this script
-        source ./bootstrap.sh
-
         # Changelog is prepared here inline instead of a separate step due to
         # an issue with passing multi-line strings between GA steps
 

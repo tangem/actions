@@ -55,7 +55,6 @@ jobs:
 
     # Prepare enviroment with installing tools
     - name: Bundle install
-      if: false
       run: bundle install --jobs 4 --retry 3
 
     # Various code-signing info, do not remove
@@ -69,9 +68,6 @@ jobs:
     # Build the app
     - name: Build
       run: |
-        # `source` is crucial since we're modifying env vars like `PATH` in this script
-        source ./bootstrap.sh
-
         bundle exec fastlane \
         build_${{ inputs.stage }} \
         build:"${{ inputs.build_number }}" \
