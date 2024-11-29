@@ -65,9 +65,8 @@ jobs:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
 
-    # Prepare enviroment with installing tools
-    - name: Bundle install
-      run: bundle install --jobs 4 --retry 3
+    - name: Install required dependencies
+      run: ./bootstrap.sh
 
     - name: Download the artifact
       uses: actions/download-artifact@v3
@@ -102,6 +101,12 @@ jobs:
         Changelog: ${RAW_CHANGELOG}
         EOF
         )
+
+        # The initialization of rbenv is required since Gihub Actions spawns each 'run' step in a separate process
+        eval "$(rbenv init - bash)"
+
+        ruby --version  # TODO: Remove
+        bundle --version  # TODO: Remove
 
         bundle exec fastlane \
         deploy_firebase \
