@@ -33,6 +33,9 @@ on:
         type: string
 
     secrets:
+      # Optional secret, since not all builds are uploaded to the Firebase
+      FIREBASE_APP_ID:
+        required: false
       # Token must have read access to all the submodule repositories
       GH_MOBILE_PAT:
         required: true
@@ -41,6 +44,7 @@ jobs:
   build:
     name: Build
     runs-on: [self-hosted, builder1]
+    environment: ${{ inputs.stage }}
     steps:
     # Various code-signing info, do not remove
     - name: Code signing debug output
