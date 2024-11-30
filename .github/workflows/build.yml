@@ -83,7 +83,7 @@ jobs:
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.filename }}
         path: "${{ inputs.path }}${{ inputs.filename }}"
