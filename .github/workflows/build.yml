@@ -42,6 +42,14 @@ jobs:
     name: Build
     runs-on: [self-hosted, active]
     steps:
+    # Various code-signing info, do not remove
+    - name: Code signing debug output
+      run: |
+        echo "Codesigning identities:"$'\n'`security find-identity -p codesigning -v`
+        echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
+        ls -ltrah ~/Library/MobileDevice/Provisioning\ Profiles || true
+        ls -ltrah ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
+
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
       run: rm -rf *
@@ -55,14 +63,6 @@ jobs:
 
     - name: Install required dependencies
       run: ./bootstrap.sh
-
-    # Various code-signing info, do not remove
-    - name: Code signing debug output
-      run: |
-        echo "Codesigning identities:"$'\n'`security find-identity -p codesigning -v`
-        echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
-        ls -ltrah ~/Library/MobileDevice/Provisioning\ Profiles || true
-        ls -ltrah ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
 
     # Build the app
     - name: Build
