@@ -49,7 +49,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: [self-hosted, builder1]
+    runs-on: [self-hosted, active]
     environment: ${{ inputs.stage }}
     outputs:
       encoded_release_url: ${{ env.encoded_release_url }}
@@ -104,9 +104,6 @@ jobs:
 
         # The initialization of rbenv is required since Gihub Actions spawns each 'run' step in a separate process
         eval "$(rbenv init - bash)"
-
-        ruby --version  # TODO: Remove
-        bundle --version  # TODO: Remove
 
         bundle exec fastlane \
         deploy_firebase \
