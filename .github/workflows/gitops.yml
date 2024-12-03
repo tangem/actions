@@ -54,8 +54,6 @@ jobs:
           push: true
           images: ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}
           tags: |
-            type=raw,value=latest
-            type=raw,value=main
             type=sha
           build-args: |
             AppVersion=${{ inputs.release-version }}
