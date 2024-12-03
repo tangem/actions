@@ -45,13 +45,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          tags: |
-            type=sha            
-
       - name: Build and push
         id: build-image
         uses: docker/build-push-action@v5
@@ -61,10 +54,7 @@ jobs:
           push: true
           images: ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}
           tags: |
-            type=sha
-          build-args: |
-            AppVersion=${{ inputs.release-version }}
-            CodeartifactAuthToken=${{ steps.get_codeartifact_token.outputs.token }}
+            ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}:${{ inputs.version }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
