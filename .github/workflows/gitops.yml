@@ -3,7 +3,7 @@ name: Build and Update ECR & GitOps
 on:
   workflow_call:
     inputs:
-      service_name:
+      service-name:
         description: "The name of the service"
         required: true
         type: string
@@ -39,12 +39,26 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and Push Image
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        run: |
-          docker build -t "$REGISTRY/${{ inputs.service_name }}:${{ inputs.version }}" .
-          docker push "$REGISTRY/${{ inputs.version }}"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        id: build-image
+        uses: docker/build-push-action@v5
+        with:
+          platforms: linux/amd64
+          context: .
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/${{ inputs.service-name }}:${{ inputs.version }}
+          build-args: |
+            AppVersion=${{ inputs.release-version }}
+            CodeartifactAuthToken=${{ steps.get_codeartifact_token.outputs.token }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
   update-gitops:
     name: Update GitOps Repository
@@ -62,9 +76,9 @@ jobs:
       - name: Update image tag
         uses: microsoft/variable-substitution@v1
         with:
-          files: gitops/apps/envs/${{ inputs.environment }}/${{ inputs.service_name }}/deployment.yaml
+          files: gitops/apps/envs/${{ inputs.environment }}/${{ inputs.service-name }}/deployment.yaml
         env:
-          spec.template.spec.containers.0.image: '${{ inputs.service_name }}:${{ inputs.version }}'
+          spec.template.spec.containers.0.image: '${{ inputs.service-name }}:${{ inputs.version }}'
 
       - name: Commit and Push Changes
         run: |
@@ -72,5 +86,5 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Update ${{ inputs.service_name }} to version ${{ inputs.version }}"
+          git commit -m "Update ${{ inputs.service-name }} to version ${{ inputs.version }}"
           git push
