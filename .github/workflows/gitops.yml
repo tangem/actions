@@ -77,7 +77,7 @@ jobs:
         with:
           files: gitops/apps/envs/${{ inputs.environment }}/${{ inputs.service-name }}/deployment.yaml
         env:
-          spec.template.spec.containers.0.image: ${{ need.build-and-push.ecr-repo }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
+          spec.template.spec.containers.0.image: ${{ needs.build-and-push.ecr-repo }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
 
       - name: Commit and Push Changes
         run: |
