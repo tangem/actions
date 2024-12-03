@@ -52,8 +52,11 @@ jobs:
           platforms: linux/amd64
           context: .
           push: true
+          images: ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}
           tags: |
-            ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}:${{ inputs.version }}
+            type=raw,value=latest
+            type=raw,value=main
+            type=sha
           build-args: |
             AppVersion=${{ inputs.release-version }}
             CodeartifactAuthToken=${{ steps.get_codeartifact_token.outputs.token }}
