@@ -1,0 +1,73 @@
+name: Build and Update ECR & GitOps
+
+on:
+  workflow_call:
+    inputs:
+      service_name:
+        description: "The name of the service"
+        required: true
+        type: string
+      version:
+        description: "The version of the service"
+        required: true
+        type: string
+      environment:
+        description: "Specify environment to update"
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          role-to-assume: ${{ secrets.IAM_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Build and Push Image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t "$REGISTRY/${{ inputs.service_name }}:${{ inputs.version }}" .
+          docker push "$REGISTRY/${{ inputs.version }}"
+
+  update-gitops:
+    name: Update GitOps Repository
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v3
+        with:
+          repository: paeracom/gitops
+          token: ${{ secrets.PAT_TOKEN }}
+          path: gitops
+
+      - name: Update image tag
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: gitops/apps/envs/${{ inputs.environment }}/${{ inputs.service_name }}/deployment.yaml
+        env:
+          spec.template.spec.containers.0.image: '${{ inputs.service_name }}:${{ inputs.version }}'
+
+      - name: Commit and Push Changes
+        run: |
+          cd gitops
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update ${{ inputs.service_name }} to version ${{ inputs.version }}"
+          git push
