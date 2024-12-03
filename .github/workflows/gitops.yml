@@ -52,7 +52,6 @@ jobs:
           platforms: linux/amd64
           context: .
           push: true
-          images: ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/services/${{ inputs.service-name }}:${{ inputs.version }}
           cache-from: type=gha
