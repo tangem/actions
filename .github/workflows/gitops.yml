@@ -15,6 +15,11 @@ on:
         description: "Specify environment to update"
         required: true
         type: string
+      dockerfile:
+        description: "Specify Dockerfile path"
+        required: optional
+        default: Dockerfile
+        type: string
 
 jobs:
   build-and-push:
@@ -53,6 +58,7 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64
           context: .
+          file: ${{ inputs.dockerfile }}
           push: true
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
