@@ -1,0 +1,89 @@
+name: Build and Update ECR & GitOps
+
+on:
+  workflow_call:
+    inputs:
+      service-name:
+        description: "The name of the service"
+        required: true
+        type: string
+      version:
+        description: "The version of the service"
+        required: true
+        type: string
+      environment:
+        description: "Specify environment to update"
+        required: true
+        type: string
+
+jobs:
+  build-and-push:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+    outputs:
+      ecr-repo: ${{ steps.login-ecr.outputs.registry }}
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.IAM_ROLE_ARN }}
+          aws-region: eu-central-1
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        id: build-image
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          context: .
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  update-gitops:
+    name: Update GitOps Repository
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v3
+        with:
+          repository: paeracom/gitops
+          token: ${{ secrets.PAT_TOKEN }}
+          path: gitops
+
+      - name: Update image tag
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: gitops/apps/envs/${{ inputs.environment }}/${{ inputs.service-name }}/deployment.yaml
+        env:
+          spec.template.spec.containers.0.image: ${{ needs.build-and-push.outputs.ecr-repo }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
+
+      - name: Commit and Push Changes
+        run: |
+          cd gitops
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update ${{ inputs.service-name }} to version ${{ inputs.version }}"
+          git push
