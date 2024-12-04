@@ -27,6 +27,14 @@ on:
       changelog:
         required: false
         type: string
+      # (Optional) Additional info about the build
+      build_description:
+        required: false
+        type: string
+      # (Optional) Encoded Firebase URL for the uploaded release
+      encoded_release_url:
+        required: false
+        type: string
     secrets:
       SLACK_BOT_TOKEN:
         required: true
@@ -63,11 +71,16 @@ jobs:
     - name: Prepare changelog
       id: changelog
       run: |
+        CHANGELOG="N/A"
+
+        if [[ -n "${{ inputs.changelog }}" ]]; then
         # Workaround for handling a multi-line text with control characters in Bash
+        # The lack of indentation within the `if-fi` scope is intentional, do not fix it
         CHANGELOG=$(cat <<'EOF'
         ${{ inputs.changelog }}
         EOF
         )
+        fi
 
         CHANGELOG="${CHANGELOG//\\/\\\\}"     # Escape backslashes (required by JSON format)
         CHANGELOG="${CHANGELOG//\"/\\\"}"     # Escape double quotes (required by JSON format)
@@ -76,6 +89,39 @@ jobs:
         CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs (required by GA)
 
         echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
+
+    - name: Prepare build description
+      id: build_description
+      run: |
+        BUILD_DESCRIPTION="N/A"
+
+        if [[ -n "${{ inputs.build_description }}" ]]; then
+          BUILD_DESCRIPTION="${{ inputs.build_description }}"
+        fi
+
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//\\/\\\\}"     # Escape backslashes (required by JSON format)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//\"/\\\"}"     # Escape double quotes (required by JSON format)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\n'/'\n'}"  # Escape newlines (required by GA)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\r'/'\r'}"  # Escape carriage returns (required by GA)
+        BUILD_DESCRIPTION="${BUILD_DESCRIPTION//$'\t'/'\t'}"  # Escape tabs (required by GA)
+
+        echo "text=$BUILD_DESCRIPTION" >> $GITHUB_OUTPUT
+
+    - name: Decode Firebase release URL
+      id: decode_release_url
+      run: |
+        ENCODED_RELEASE_URL="${{ inputs.encoded_release_url }}"
+
+        if [[ -n "${ENCODED_RELEASE_URL}" ]]; then
+          # Decoding string encoded twice using base64 encoding
+          # See https://github.com/orgs/community/discussions/13082#discussioncomment-6776428 for details
+          RELEASE_URL=$(echo "${ENCODED_RELEASE_URL}" | base64 --decode | base64 --decode)
+        else
+          # Fallback to the default value
+          RELEASE_URL="https://appdistribution.firebase.google.com/testerapps"
+        fi
+
+        echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
 
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
@@ -137,6 +183,13 @@ jobs:
                       "type": "section",
                       "text": {
                           "type": "mrkdwn",
+                          "text": "*Additional description:*\n${{ steps.build_description.outputs.text }}"
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
                           "text": "*Changelog:*\n${{ steps.changelog.outputs.text }}"
                       }
                   },
@@ -144,7 +197,14 @@ jobs:
                       "type": "section",
                       "text": {
                           "type": "mrkdwn",
-                          "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
+                          "text": "<${{ steps.decode_release_url.outputs.release_url }}|:calling: Install this release using Firebase>"
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|:hammer_and_wrench: View this action on GitHub>"
                       }
                   }
               ]
