@@ -63,83 +63,91 @@ jobs:
     - name: Prepare changelog
       id: changelog
       run: |
-        CHANGELOG=${{ inputs.changelog }}
-        CHANGELOG="${CHANGELOG//'%'/'%25'}"
-        CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
-        CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
-        echo "::set-output name=text::$CHANGELOG"
-        
+        # Workaround for handling a multi-line text with control characters in Bash
+        CHANGELOG=$(cat <<'EOF'
+        ${{ inputs.changelog }}
+        EOF
+        )
+
+        CHANGELOG="${CHANGELOG//\\/\\\\}"     # Escape backslashes (required by JSON format)
+        CHANGELOG="${CHANGELOG//\"/\\\"}"     # Escape double quotes (required by JSON format)
+        CHANGELOG="${CHANGELOG//$'\n'/'\n'}"  # Escape newlines (required by GA)
+        CHANGELOG="${CHANGELOG//$'\r'/'\r'}"  # Escape carriage returns (required by GA)
+        CHANGELOG="${CHANGELOG//$'\t'/'\t'}"  # Escape tabs (required by GA)
+
+        echo "text=$CHANGELOG" >> $GITHUB_OUTPUT
+
     - id: slack_message
       uses: slackapi/slack-github-action@v1.23.0
       with:
-       channel-id: "${{ inputs.channel }}"
-       update-ts: "${{ inputs.message_ts }}"
-       payload: |
-        {
-            "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
-            "blocks": [
-                {
-                    "type": "header",
-                    "text": {
-                        "type": "plain_text",
-                        "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
-                        "emoji": true
-                    }
-                },
-                {
-                    "type": "context",
-                    "elements": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "${{ steps.statuses.outputs.status }}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Version:*\n${{ inputs.version }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Build number:*\n${{ inputs.build_number }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Commmit:*\n${{ github.sha }}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "fields": [
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Branch:*\n${{ github.ref_name }}"
-                        },
-                        {
-                            "type": "mrkdwn",
-                            "text": "*Started by:*\n${{ github.actor }}"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "*Changelog:*\n${{ steps.changelog.outputs.text }}"
-                    }
-                },
-                {
-                    "type": "section",
-                    "text": {
-                        "type": "mrkdwn",
-                        "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
-                    }
-                }
-            ]
-        }
+        channel-id: "${{ inputs.channel }}"
+        update-ts: "${{ inputs.message_ts }}"
+        payload: |
+          {
+              "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
+              "blocks": [
+                  {
+                      "type": "header",
+                      "text": {
+                          "type": "plain_text",
+                          "text": "${{ inputs.app_name }} → ${{ inputs.deploy_to }}",
+                          "emoji": true
+                      }
+                  },
+                  {
+                      "type": "context",
+                      "elements": [
+                          {
+                              "type": "mrkdwn",
+                              "text": "${{ steps.statuses.outputs.status }}"
+                          }
+                      ]
+                  },
+                  {
+                      "type": "section",
+                      "fields": [
+                          {
+                              "type": "mrkdwn",
+                              "text": "*Version:*\n${{ inputs.version }}"
+                          },
+                          {
+                              "type": "mrkdwn",
+                              "text": "*Build number:*\n${{ inputs.build_number }}"
+                          },
+                          {
+                              "type": "mrkdwn",
+                              "text": "*Commmit:*\n${{ github.sha }}"
+                          }
+                      ]
+                  },
+                  {
+                      "type": "section",
+                      "fields": [
+                          {
+                              "type": "mrkdwn",
+                              "text": "*Branch:*\n${{ github.ref_name }}"
+                          },
+                          {
+                              "type": "mrkdwn",
+                              "text": "*Started by:*\n${{ github.actor }}"
+                          }
+                      ]
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "*Changelog:*\n${{ steps.changelog.outputs.text }}"
+                      }
+                  },
+                  {
+                      "type": "section",
+                      "text": {
+                          "type": "mrkdwn",
+                          "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View this action on GitHub>"
+                      }
+                  }
+              ]
+          }
       env:
-       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN}}

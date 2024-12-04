@@ -3,11 +3,11 @@ name: Firebase
 on:
   workflow_call:
     inputs:
-      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate 
+      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate
       # Alpha - Alpha build aka Feature build is built from a feature branch and will be deploied to Google Distribution
       # Beta - Alpha build aka Development build is built from a develop branch and will be deploied to Google Distribution
-      # RC - RC build is built from release branch and will be deploied to the application stores 
-      stage: 
+      # RC - RC build is built from release branch and will be deploied to the application stores
+      stage:
         required: true
         type: string
       # Version will be set to the app and will be shown in Google distribution, application store as well as inside the app.
@@ -24,10 +24,10 @@ on:
         required: false
         type: string
       # Name that will be used for the artifact
-      filename: 
+      filename:
         required: true
         type: string
-    
+
     secrets:
       FIREBASE_APP_ID:
         required: true
@@ -46,8 +46,8 @@ jobs:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
       run: rm -rf *
-    
-    # Check out git repositories and submodules to get fatslane instructions 
+
+    # Check out git repositories and submodules to get fatslane instructions
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -57,13 +57,27 @@ jobs:
     # Prepare enviroment with installing tools
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
-        
+
     - name: Download the artifact
       uses: actions/download-artifact@v3
       with:
         name: ${{ inputs.filename }}
         path: artifacts/
-       
+
     - name: Deploy to Firebase
-      run: bundle exec fastlane deploy_firebase app_id:"${{ secrets.FIREBASE_APP_ID }}" path:"artifacts/${{ inputs.filename }}" firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" changelog:"${{inputs.changelog}}"
-   
+      run: |
+        # Changelog is prepared here inline instead of a separate step due to
+        # an issue with passing multi-line strings between GA steps
+        #
+        # Workaround for handling a multi-line text with control characters in Bash
+        CHANGELOG=$(cat <<'EOF'
+        ${{ inputs.changelog }}
+        EOF
+        )
+
+        bundle exec fastlane \
+        deploy_firebase \
+        app_id:"${{ secrets.FIREBASE_APP_ID }}" \
+        path:"artifacts/${{ inputs.filename }}" \
+        firebase_token:"${{ secrets.FIREBASE_CLI_TOKEN }}" \
+        changelog:"${CHANGELOG}"

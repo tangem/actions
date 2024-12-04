@@ -3,11 +3,11 @@ name: Build
 on:
   workflow_call:
     inputs:
-      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate 
+      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate
       # Alpha - Alpha build aka Feature build is built from a feature branch and will be deploied to Google Distribution
       # Beta - Alpha build aka Development build is built from a develop branch and will be deploied to Google Distribution
-      # RC - RC build is built from release branch and will be deploied to the application stores 
-      stage: 
+      # RC - RC build is built from release branch and will be deploied to the application stores
+      stage:
         required: true
         type: string
       # Version will be set to the app and will be shown in Google distribution, application store as well as inside the app.
@@ -20,14 +20,18 @@ on:
         required: true
         type: string
       # Name that will be used for the artifact
-      filename: 
+      filename:
         required: true
         type: string
       # Name that will be used for the artifact
-      path: 
+      path:
         required: true
         type: string
-    
+      # Optional Xcode version override. Leave blank (default value) to use the default Xcode version;
+      # Pass a custom value (e.g. '16.0', '10.2.1', '11 Beta 7', '11.2 GM seed', etc) to use a different Xcode version for the build
+      xcode_version_override:
+        type: string
+
     secrets:
       # Token must have read access to all the submodule repositories
       GH_MOBILE_PAT:
@@ -41,23 +45,38 @@ jobs:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
       run: rm -rf *
-    
+
     # Check out git repositories and submodules.
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
-    
+
     # Prepare enviroment with installing tools
     - name: Bundle install
       run: bundle install --jobs 4 --retry 3
-    
+
+    # Various code-signing info, do not remove
+    - name: Code signing debug output
+      run: |
+        echo "Codesigning identities:"$'\n'`security find-identity -p codesigning -v`
+        echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
+        ls -ltrah /Users/builder1/Library/MobileDevice/Provisioning\ Profiles || true
+        ls -ltrah /Users/builder1/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
+
     # Build the app
     - name: Build
-      run: bundle exec fastlane build_${{ inputs.stage }} build:"${{ inputs.build_number }}" version:"${{ inputs.version }}" path:"${{ inputs.path }}" filename:"${{ inputs.filename }}"
+      run: |
+        bundle exec fastlane \
+        build_${{ inputs.stage }} \
+        build:"${{ inputs.build_number }}" \
+        version:"${{ inputs.version }}" \
+        path:"${{ inputs.path }}" \
+        filename:"${{ inputs.filename }}" \
+        xcode_version_override:"${{ inputs.xcode_version_override }}"
 
-    # Upload artifact to be able to reuse in the following jobs 
+    # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
       uses: actions/upload-artifact@v3
       with:
