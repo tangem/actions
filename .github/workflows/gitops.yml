@@ -17,7 +17,7 @@ on:
         type: string
       dockerfile:
         description: "Specify Dockerfile path"
-        required: optional
+        required: false
         default: Dockerfile
         type: string
 
