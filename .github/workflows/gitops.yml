@@ -27,10 +27,12 @@ jobs:
     runs-on: ubuntu-latest
     services:
       docker:
-        image: docker:dind
+        image: docker:23
         options: --privileged --mount type=volume,source=docker,target=/var/run/docker
         volumes:
-          - /var/run/docker.sock:/var/run/docker.sock:ro
+          - /run/docker/docker.sock:/run/docker/docker.sock
+        env:
+          DOCKER_HOST: unix:///run/docker/docker.sock
     outputs:
       ecr-repo: ${{ steps.login-ecr.outputs.registry }}
 
