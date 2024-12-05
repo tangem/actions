@@ -20,13 +20,6 @@ on:
         required: false
         default: Dockerfile
         type: string
-    secrets:
-      grp-username:
-        description: "For building application"
-        required: false
-      grp-token:
-        description: "For building application"
-        required: false
 
 jobs:
   build-and-push:
@@ -68,8 +61,8 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: true
           build-args: |
-            GPR_USERNAME: ${{ secrets.grp-username }}
-            GPR_TOKEN: ${{ secrets.grp-token }}
+            GPR_USERNAME: ${{ secrets.GPR_USERNAME }}
+            GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
           cache-from: type=gha
