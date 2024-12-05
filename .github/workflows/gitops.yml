@@ -25,6 +25,12 @@ jobs:
   build-and-push:
     name: Build and Push Image
     runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+        options: --privileged --shm-size=2g
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro
     outputs:
       ecr-repo: ${{ steps.login-ecr.outputs.registry }}
 
