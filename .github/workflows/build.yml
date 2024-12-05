@@ -33,6 +33,9 @@ on:
         type: string
 
     secrets:
+      # Optional secret, since not all builds are uploaded to the Firebase
+      FIREBASE_APP_ID:
+        required: false
       # Token must have read access to all the submodule repositories
       GH_MOBILE_PAT:
         required: true
@@ -41,7 +44,16 @@ jobs:
   build:
     name: Build
     runs-on: [self-hosted, active]
+    environment: ${{ inputs.stage }}
     steps:
+    # Various code-signing info, do not remove
+    - name: Code signing debug output
+      run: |
+        echo "Codesigning identities:"$'\n'`security find-identity -p codesigning -v`
+        echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
+        ls -ltrah ~/Library/MobileDevice/Provisioning\ Profiles || true
+        ls -ltrah ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
+
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
       run: rm -rf *
@@ -53,32 +65,27 @@ jobs:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
 
-    # Prepare enviroment with installing tools
-    - name: Bundle install
-      run: bundle install --jobs 4 --retry 3
-
-    # Various code-signing info, do not remove
-    - name: Code signing debug output
-      run: |
-        echo "Codesigning identities:"$'\n'`security find-identity -p codesigning -v`
-        echo "DVTDeveloperAccountManagerAppleIDLists content:"$'\n'`defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`
-        ls -ltrah ~/Library/MobileDevice/Provisioning\ Profiles || true
-        ls -ltrah ~/Library/Developer/Xcode/UserData/Provisioning\ Profiles || true
+    - name: Install required dependencies
+      run: ./bootstrap.sh
 
     # Build the app
     - name: Build
       run: |
+        # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
+        eval "$(rbenv init - bash)"
+
         bundle exec fastlane \
         build_${{ inputs.stage }} \
         build:"${{ inputs.build_number }}" \
         version:"${{ inputs.version }}" \
         path:"${{ inputs.path }}" \
         filename:"${{ inputs.filename }}" \
+        firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
         xcode_version_override:"${{ inputs.xcode_version_override }}"
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.filename }}
         path: "${{ inputs.path }}${{ inputs.filename }}"

@@ -49,7 +49,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: [self-hosted,active]
+    runs-on: [self-hosted, active]
     environment: ${{ inputs.stage }}
     outputs:
       encoded_release_url: ${{ env.encoded_release_url }}
@@ -65,12 +65,11 @@ jobs:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
 
-    # Prepare enviroment with installing tools
-    - name: Bundle install
-      run: bundle install --jobs 4 --retry 3
+    - name: Install required dependencies
+      run: ./bootstrap.sh --skip-cocoapods
 
     - name: Download the artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ inputs.filename }}
         path: artifacts/
@@ -102,6 +101,9 @@ jobs:
         Changelog: ${RAW_CHANGELOG}
         EOF
         )
+
+        # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
+        eval "$(rbenv init - bash)"
 
         bundle exec fastlane \
         deploy_firebase \
