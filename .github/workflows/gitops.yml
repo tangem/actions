@@ -26,13 +26,19 @@ jobs:
     name: Build and Push Image
     runs-on: ubuntu-latest
     services:
-      docker:
-        image: docker:23
-        options: --privileged --mount type=volume,source=docker,target=/var/run/docker
-        volumes:
-          - /run/docker/docker.sock:/run/docker/docker.sock
+      postgres:
+        image: postgres:latest
         env:
-          DOCKER_HOST: unix:///run/docker/docker.sock
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tangembridge
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     outputs:
       ecr-repo: ${{ steps.login-ecr.outputs.registry }}
 
