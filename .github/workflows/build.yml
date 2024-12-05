@@ -80,7 +80,7 @@ jobs:
         version:"${{ inputs.version }}" \
         path:"${{ inputs.path }}" \
         filename:"${{ inputs.filename }}" \
-        app_id:"${{ secrets.FIREBASE_APP_ID }}" \
+        firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
         xcode_version_override:"${{ inputs.xcode_version_override }}"
 
     # Upload artifact to be able to reuse in the following jobs
