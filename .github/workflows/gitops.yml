@@ -90,6 +90,10 @@ jobs:
           cd gitops
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add .
-          git commit -m "Update ${{ inputs.service-name }} to version ${{ inputs.version }}"
-          git push
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Update ${{ inputs.service_name }} to version ${{ inputs.version }}"
+            git push
+          else
+            echo "Nothing to commit, working tree clean."
+          fi
