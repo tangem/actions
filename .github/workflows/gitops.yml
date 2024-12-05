@@ -28,7 +28,7 @@ jobs:
     services:
       docker:
         image: docker:dind
-        options: --privileged --shm-size=2g
+        options: --privileged --mount type=volume,source=docker,target=/var/run/docker
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock:ro
     outputs:
