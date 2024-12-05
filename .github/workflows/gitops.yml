@@ -72,7 +72,6 @@ jobs:
         with:
           platforms: linux/amd64
           allow: network.host
-          network: bridge
           context: .
           file: ${{ inputs.dockerfile }}
           push: true
