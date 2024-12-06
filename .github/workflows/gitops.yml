@@ -62,8 +62,8 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: true
           secrets: |
-            "gpr_username=${{ secrets.GPR_USERNAME }}" 
-            "gpr_token=${{ secrets.GPR_TOKEN }}" 
+            'gpr_username=${{ secrets.GPR_USERNAME }}'
+            'gpr_token=${{ secrets.GPR_TOKEN }}'
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
           cache-from: type=gha
