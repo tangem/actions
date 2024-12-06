@@ -61,9 +61,6 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile }}
           push: true
-          build-args: |
-            GPR_USERNAME: ${{ secrets.GPR_USERNAME }}
-            GPR_TOKEN: ${{ secrets.GPR_TOKEN }}
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/services/paera/${{ inputs.service-name }}:${{ inputs.version }}
           cache-from: type=gha
