@@ -66,7 +66,7 @@ jobs:
         token: ${{ secrets.GH_MOBILE_PAT }}
 
     - name: Install required dependencies
-      run: ./bootstrap.sh --skip-cocoapods
+      run: ./bootstrap.sh
 
     - name: Download the artifact
       uses: actions/download-artifact@v4
