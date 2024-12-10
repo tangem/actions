@@ -79,6 +79,6 @@ jobs:
         asc_issuer_id:"${{ secrets.ASC_ISSUER_ID }}" \
         asc_key:"${{ secrets.ASC_PRIVATE_KEY }}" \
         path:"artifacts/${{ inputs.filename }}" \
-        version: "${{ inputs.version }}" \
-        build_number: "${{ inputs.build_number }}" \
+        version:"${{ inputs.version }}" \
+        build_number:"${{ inputs.build_number }}" \
         changelog:"${{inputs.changelog}}"
