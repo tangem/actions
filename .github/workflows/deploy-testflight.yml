@@ -3,10 +3,10 @@ name: Testflight
 on:
   workflow_call:
     inputs:
-      # Stage will be passed to Fastlane to prepare the right build and sign it with the right certificate 
+      # Stage will be passed to Fastlane to prepare the right build and sign it with the right certificate
       # Alpha - Alpha build, aka Feature build, is built from a feature branch and will be deployed to Google Distribution
       # Beta - Alpha build, aka Development build, is built from a develop branch and will be deployed to Google Distribution
-      # RC - RC build is built from the release branch and will be deployed to the application stores 
+      # RC - RC build is built from the release branch and will be deployed to the application stores
       stage: 
         required: true
         type: string
@@ -27,7 +27,7 @@ on:
       filename: 
         required: true
         type: string
-    
+
     secrets:
       # App Store Connect Key ID
       ASC_KEY_ID:
@@ -45,26 +45,39 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: [self-hosted, builder2]
+    runs-on: [self-hosted, active]
     environment: ${{ inputs.stage }}
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.
     - name: Clean
       run: rm -rf *
-    
-    # Check out git repositories and submodules to get fatslane instructions 
+
+    # Check out git repositories and submodules to get fatslane instructions
     - name: Checkout
       uses: actions/checkout@v3
       with:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
-        
+
+    - name: Install required dependencies
+      run: ./bootstrap.sh
+
     - name: Download the artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: ${{ inputs.filename }}
         path: artifacts/
     
     - name: Deploy to Testflight
-      run: bundle exec fastlane deploy_testflight asc_key_id:"${{ secrets.ASC_KEY_ID }}" asc_issuer_id:"${{ secrets.ASC_ISSUER_ID }}" asc_key:"${{ secrets.ASC_PRIVATE_KEY }}" path:"artifacts/${{ inputs.filename }}" changelog:"${{inputs.changelog}}"
+      run: |
+        # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
+        eval "$(rbenv init - bash)"
+
+        bundle exec fastlane \
+        deploy_testflight \
+        asc_key_id:"${{ secrets.ASC_KEY_ID }}" \
+        asc_issuer_id:"${{ secrets.ASC_ISSUER_ID }}" \
+        asc_key:"${{ secrets.ASC_PRIVATE_KEY }}" \
+        path:"artifacts/${{ inputs.filename }}" \
+        changelog:"${{inputs.changelog}}"
    
