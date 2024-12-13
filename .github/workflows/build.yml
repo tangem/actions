@@ -3,10 +3,10 @@ name: Build
 on:
   workflow_call:
     inputs:
-      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate
-      # Alpha - Alpha build aka Feature build is built from a feature branch and will be deploied to Google Distribution
-      # Beta - Alpha build aka Development build is built from a develop branch and will be deploied to Google Distribution
-      # RC - RC build is built from release branch and will be deploied to the application stores
+      # Stage will be passed to Fastlane to prepare the right build and sign it with the right certificate
+      # Alpha - Alpha build, aka Feature build, is built from a feature branch and will be deployed to Google Distribution
+      # Beta - Alpha build, aka Development build, is built from a develop branch and will be deployed to Google Distribution
+      # RC - RC build is built from release branch and will be deployed to the application stores
       stage:
         required: true
         type: string
@@ -31,6 +31,12 @@ on:
       # Pass a custom value (e.g. '16.0', '10.2.1', '11 Beta 7', '11.2 GM seed', etc) to use a different Xcode version for the build
       xcode_version_override:
         type: string
+      # Optional flag, set it to true if this workflow should use ARM64 runners only
+      # Warning: reusable workflows receive ALL inputs as strings, matter their actual types (boolean in this case)
+      arm_runners_only:
+        required: false
+        default: 'false'
+        type: string
 
     secrets:
       # Optional secret, since not all builds are uploaded to the Firebase
@@ -43,7 +49,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, active]
+    runs-on: [self-hosted, active, "${{ inputs.arm_runners_only == 'true' && 'ARM64' || 'macOS' }}"]
     environment: ${{ inputs.stage }}
     steps:
     # Various code-signing info, do not remove

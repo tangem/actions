@@ -117,10 +117,11 @@ jobs:
         if [[ -n "${ENCODED_RELEASE_URL}" ]]; then
           # Decoding string encoded twice using base64 encoding
           # See https://github.com/orgs/community/discussions/13082#discussioncomment-6776428 for details
-          RELEASE_URL=$(echo "${ENCODED_RELEASE_URL}" | base64 --decode | base64 --decode)
+          DECODED_RELEASE_URL=$(echo "${ENCODED_RELEASE_URL}" | base64 --decode | base64 --decode)
+          RELEASE_URL="<${DECODED_RELEASE_URL}|:calling: Install this release using Firebase>"
         else
           # Fallback to the default value
-          RELEASE_URL="https://appdistribution.firebase.google.com/testerapps"
+          RELEASE_URL="No installation URL available"
         fi
 
         echo "release_url=$RELEASE_URL" >> $GITHUB_OUTPUT
@@ -199,7 +200,7 @@ jobs:
                       "type": "section",
                       "text": {
                           "type": "mrkdwn",
-                          "text": "<${{ steps.decode_release_url.outputs.release_url }}|:calling: Install this release using Firebase>"
+                          "text": "${{ steps.decode_release_url.outputs.release_url }}"
                       }
                   },
                   {

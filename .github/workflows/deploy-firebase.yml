@@ -3,10 +3,10 @@ name: Firebase
 on:
   workflow_call:
     inputs:
-      # Stage will be passed to Fastlane to prepare the the right build and sign it with the right certificate
-      # Alpha - Alpha build aka Feature build is built from a feature branch and will be deploied to Google Distribution
-      # Beta - Alpha build aka Development build is built from a develop branch and will be deploied to Google Distribution
-      # RC - RC build is built from release branch and will be deploied to the application stores
+      # Stage will be passed to Fastlane to prepare the right build and sign it with the right certificate
+      # Alpha - Alpha build, aka Feature build, is built from a feature branch and will be deployed to Google Distribution
+      # Beta - Alpha build, aka Development build, is built from a develop branch and will be deployed to Google Distribution
+      # RC - RC build is built from the release branch and will be deployed to the application stores
       stage:
         required: true
         type: string
