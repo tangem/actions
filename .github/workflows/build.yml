@@ -37,6 +37,11 @@ on:
         required: false
         default: 'false'
         type: string
+      # TODO: Add descr
+      analyze_archive:
+        required: false
+        default: 'false'
+        type: string
 
     secrets:
       # Optional secret, since not all builds are uploaded to the Firebase
@@ -64,6 +69,14 @@ jobs:
     - name: Clean
       run: rm -rf *
 
+    - name: Checkout private-app-config if needed
+      uses: actions/checkout@v3
+      if: "${{ inputs.analyze_archive == 'true' }}"
+      with:
+        repository: tangem/private-app-config
+        path: "./private-app-config"
+        token: ${{ secrets.GH_MOBILE_PAT }}
+
     # Check out git repositories and submodules.
     - name: Checkout
       uses: actions/checkout@v3
@@ -87,7 +100,8 @@ jobs:
         path:"${{ inputs.path }}" \
         filename:"${{ inputs.filename }}" \
         firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
-        xcode_version_override:"${{ inputs.xcode_version_override }}"
+        xcode_version_override:"${{ inputs.xcode_version_override }}" \
+        analyze_archive:"${{ inputs.analyze_archive }}"
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
