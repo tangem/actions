@@ -37,7 +37,8 @@ on:
         required: false
         default: 'false'
         type: string
-      # TODO: Add descr
+      # Optional flag, set it to true if the result binary should be analyzed
+      # Warning: reusable workflows receive ALL inputs as strings, matter their actual types (boolean in this case)
       analyze_archive:
         required: false
         default: 'false'
