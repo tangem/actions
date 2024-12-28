@@ -69,19 +69,19 @@ jobs:
     - name: Clean
       run: rm -rf *
 
+    # Check out git repositories and submodules.
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        submodules: true
+        token: ${{ secrets.GH_MOBILE_PAT }}
+
     - name: Checkout private-app-config if needed
       uses: actions/checkout@v3
       if: "${{ inputs.analyze_archive == 'true' }}"
       with:
         repository: tangem/private-app-config
         path: "./private-app-config"
-        token: ${{ secrets.GH_MOBILE_PAT }}
-
-    # Check out git repositories and submodules.
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
 
     - name: Install required dependencies
