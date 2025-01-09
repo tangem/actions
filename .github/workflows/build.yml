@@ -95,6 +95,8 @@ jobs:
         # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
         eval "$(rbenv init - bash)"
 
+        CODE_SIGN_ID_KEY=$(echo "CODE_SIGN_ID_${{ runner.name }}" | tr "[:lower:]" "[:upper:]")
+
         bundle exec fastlane \
         build_${{ inputs.stage }} \
         build:"${{ inputs.build_number }}" \
@@ -103,7 +105,8 @@ jobs:
         filename:"${{ inputs.filename }}" \
         firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
         xcode_version_override:"${{ inputs.xcode_version_override }}" \
-        analyze_archive:"${{ inputs.analyze_archive }}"
+        analyze_archive:"${{ inputs.analyze_archive }}" \
+        code_sign_identity:vars["${CODE_SIGN_ID_KEY}"]
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
