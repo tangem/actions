@@ -83,7 +83,7 @@ jobs:
         # an issue with passing multi-line strings between GA steps
 
         # Fallback if there is no changelog info; e.g. when there is no Jira task associated with the branch
-        if [[ "${RAW_CHANGELOG}" =~ ^[[:space:]]*$ ]]; then
+        if [[ "${RAW_CHANGELOG}" =~ ^[[:space:]]*$ || "${RAW_CHANGELOG}" == "false" ]]; then
           RAW_CHANGELOG="N/A"
         fi
 
