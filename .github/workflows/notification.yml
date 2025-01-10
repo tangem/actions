@@ -75,7 +75,7 @@ jobs:
         SLACK_MESSAGE_SECTION_MAX_LENGTH: 2950
       run: |
         # Fallback if there is no changelog info; e.g. when there is no Jira task associated with the branch
-        if [[ "${CHANGELOG}" =~ ^[[:space:]]*$ ]]; then
+        if [[ "${CHANGELOG}" =~ ^[[:space:]]*$ || "${CHANGELOG}" == "false" ]]; then
           CHANGELOG="N/A"
         fi
 
