@@ -83,7 +83,7 @@ jobs:
         # an issue with passing multi-line strings between GA steps
 
         # Fallback if there is no changelog info; e.g. when there is no Jira task associated with the branch
-        if [[ "${RAW_CHANGELOG}" =~ ^[[:space:]]*$ ]]; then
+        if [[ "${RAW_CHANGELOG}" =~ ^[[:space:]]*$ || "${RAW_CHANGELOG}" == "false" ]]; then
           RAW_CHANGELOG="N/A"
         fi
 
@@ -96,11 +96,17 @@ jobs:
         )$'\n'
         fi
 
+        if [ "$(echo "$RAW_CHANGELOG" | wc -l)" -gt 1 ]; then
         # Workaround for handling a multi-line text with control characters in Bash
+        # The lack of indentation within the `if-fi` scope is intentional, do not fix it
         CHANGELOG+=$(cat <<EOF
-        Changelog: ${RAW_CHANGELOG}
+        Changelog:
+        ${RAW_CHANGELOG}
         EOF
         )
+        else
+          CHANGELOG+="Changelog: ${RAW_CHANGELOG}"
+        fi
 
         # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
         eval "$(rbenv init - bash)"
