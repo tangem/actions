@@ -93,15 +93,19 @@ jobs:
     - name: Convert runner name
       env:
         RAW_RUNNER_NAME: ${{ runner.name }}
-      run: echo "RUNNER_NAME=$(echo '${RAW_RUNNER_NAME}' | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
+      run: echo "UPPERCASED_RUNNER_NAME=$(echo ${RAW_RUNNER_NAME} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
 
     # Build the app
     - name: Build
+      env:
+        TEST1_RUNNER_NAME: ${{ runner.name }}
+        TEST2_RUNNER_NAME: ${{ env.UPPERCASED_RUNNER_NAME }}
       run: |
         # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
         eval "$(rbenv init - bash)"
 
-        echo "RUNNER_NAME: ${RUNNER_NAME}"  # TODO: Test only, remove
+        echo "TEST1_RUNNER_NAME: ${TEST1_RUNNER_NAME}"  # TODO: Test only, remove
+        echo "TEST2_RUNNER_NAME: ${TEST2_RUNNER_NAME}"  # TODO: Test only, remove
 
         bundle exec fastlane \
         build_${{ inputs.stage }} \
@@ -112,7 +116,7 @@ jobs:
         firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
         xcode_version_override:"${{ inputs.xcode_version_override }}" \
         analyze_archive:"${{ inputs.analyze_archive }}" \
-        code_sign_identity:"${{ vars[format('CODE_SIGN_ID_{0}', env.RUNNER_NAME)] }}"
+        code_sign_identity:"${{ secrets[format('CODE_SIGN_ID_{0}', env.UPPERCASED_RUNNER_NAME)] }}"
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
