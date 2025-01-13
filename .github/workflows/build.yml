@@ -98,6 +98,7 @@ jobs:
         eval "$(rbenv init - bash)"
 
         RUNNER_NAME=$(echo "${RUNNER_NAME}" | tr "[:lower:]" "[:upper:]")
+        echo "RUNNER_NAME: ${RUNNER_NAME}"  # TODO: Test only, remove
 
         bundle exec fastlane \
         build_${{ inputs.stage }} \
