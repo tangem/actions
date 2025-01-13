@@ -55,7 +55,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: builder1 # TODO: Test only, remove
+    runs-on: builder2 # TODO: Test only, remove
     environment: ${{ inputs.stage }}
     steps:
     # Various code-signing info, do not remove
