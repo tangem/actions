@@ -55,7 +55,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: bamboo # TODO: Test only, remove
+    runs-on: [self-hosted, active, "${{ inputs.arm_runners_only == 'true' && 'ARM64' || 'macOS' }}"]
     environment: ${{ inputs.stage }}
     steps:
     # Various code-signing info, do not remove
