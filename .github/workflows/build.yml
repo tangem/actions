@@ -108,7 +108,7 @@ jobs:
         firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
         xcode_version_override:"${{ inputs.xcode_version_override }}" \
         analyze_archive:"${{ inputs.analyze_archive }}" \
-        code_sign_identity:"${{ vars.format('CODE_SIGN_ID_{0}', RUNNER_NAME) }}"
+        code_sign_identity:"${{ vars[format('CODE_SIGN_ID_{0}', ${RUNNER_NAME})] }}"
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
