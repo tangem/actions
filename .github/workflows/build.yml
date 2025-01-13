@@ -97,15 +97,9 @@ jobs:
 
     # Build the app
     - name: Build
-      env:
-        TEST1_RUNNER_NAME: ${{ runner.name }}
-        TEST2_RUNNER_NAME: ${{ env.UPPERCASED_RUNNER_NAME }}
       run: |
         # The initialization of rbenv is required before every `bundle` call since Gihub Actions spawns each 'run' step in a separate process
         eval "$(rbenv init - bash)"
-
-        echo "TEST1_RUNNER_NAME: ${TEST1_RUNNER_NAME}"  # TODO: Test only, remove
-        echo "TEST2_RUNNER_NAME: ${TEST2_RUNNER_NAME}"  # TODO: Test only, remove
 
         bundle exec fastlane \
         build_${{ inputs.stage }} \
