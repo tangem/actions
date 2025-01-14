@@ -84,7 +84,6 @@ jobs:
         repository: tangem/private-app-config
         path: "./private-app-config"
         token: ${{ secrets.GH_MOBILE_PAT }}
-        ref: "feature/IOS-8931_improve_ios_config"  # TODO: Test only, remove
 
     - name: Install required dependencies
       run: ./bootstrap.sh
