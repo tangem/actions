@@ -37,6 +37,12 @@ on:
         required: false
         default: 'false'
         type: string
+      # Optional flag, set it to true if the result binary should be analyzed
+      # Warning: reusable workflows receive ALL inputs as strings, matter their actual types (boolean in this case)
+      analyze_archive:
+        required: false
+        default: 'false'
+        type: string
 
     secrets:
       # Optional secret, since not all builds are uploaded to the Firebase
@@ -71,8 +77,22 @@ jobs:
         submodules: true
         token: ${{ secrets.GH_MOBILE_PAT }}
 
+    - name: Checkout private-app-config if needed
+      uses: actions/checkout@v3
+      if: "${{ inputs.analyze_archive == 'true' }}"
+      with:
+        repository: tangem/private-app-config
+        path: "./private-app-config"
+        token: ${{ secrets.GH_MOBILE_PAT }}
+
     - name: Install required dependencies
       run: ./bootstrap.sh
+
+    # Convert the runner name to upper case so it can be used to access repo variables
+    - name: Convert runner name
+      env:
+        RAW_RUNNER_NAME: ${{ runner.name }}
+      run: echo "UPPERCASED_RUNNER_NAME=$(echo ${RAW_RUNNER_NAME} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
 
     # Build the app
     - name: Build
@@ -87,7 +107,9 @@ jobs:
         path:"${{ inputs.path }}" \
         filename:"${{ inputs.filename }}" \
         firebase_app_id:"${{ secrets.FIREBASE_APP_ID }}" \
-        xcode_version_override:"${{ inputs.xcode_version_override }}"
+        xcode_version_override:"${{ inputs.xcode_version_override }}" \
+        analyze_archive:"${{ inputs.analyze_archive }}" \
+        code_sign_identity:"${{ vars[format('CODE_SIGN_ID_{0}', env.UPPERCASED_RUNNER_NAME)] }}"
 
     # Upload artifact to be able to reuse in the following jobs
     - name: Upload binary artifact
