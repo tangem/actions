@@ -45,7 +45,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: [self-hosted, active]
+    runs-on: builder3
     environment: ${{ inputs.stage }}
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.

@@ -49,7 +49,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: [self-hosted, active]
+    runs-on: builder3
     environment: ${{ inputs.stage }}
     outputs:
       encoded_release_url: ${{ env.encoded_release_url }}
