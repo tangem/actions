@@ -31,6 +31,10 @@ on:
       filename:
         required: true
         type: string
+      # Self-hosted runner to run the build. Optional
+      runner_name:
+        required: false
+        type: string
 
     outputs:
       encoded_release_url:
@@ -49,7 +53,7 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: [self-hosted, active]
+    runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON("['self-hosted', 'active']")) }}
     environment: ${{ inputs.stage }}
     outputs:
       encoded_release_url: ${{ env.encoded_release_url }}

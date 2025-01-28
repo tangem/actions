@@ -43,6 +43,10 @@ on:
         required: false
         default: 'false'
         type: string
+      # Self-hosted runner to run the build. Optional
+      runner_name:
+        required: false
+        type: string
 
     secrets:
       # Optional secret, since not all builds are uploaded to the Firebase
@@ -55,7 +59,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, active, "${{ inputs.arm_runners_only == 'true' && 'ARM64' || 'macOS' }}"]
+    runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON(format("['self-hosted', 'active'{0}]", (inputs.arm_runners_only == "true" && ", 'ARM64'" || "")))) }}
     environment: ${{ inputs.stage }}
     steps:
     # Various code-signing info, do not remove
