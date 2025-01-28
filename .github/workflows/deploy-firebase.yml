@@ -53,7 +53,8 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON("['self-hosted', 'active']")) }}
+    # Docs: To use a literal single quote, escape the literal single quote using an additional single quote ('')
+    runs-on: ${{ (inputs.runner_name != '' && inputs.runner_name) || (fromJSON('[''self-hosted'', ''active'']')) }}
     environment: ${{ inputs.stage }}
     outputs:
       encoded_release_url: ${{ env.encoded_release_url }}

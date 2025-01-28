@@ -49,7 +49,8 @@ on:
 jobs:
   deploy:
     name: Deploy
-    runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON("['self-hosted', 'active']")) }}
+    # Docs: To use a literal single quote, escape the literal single quote using an additional single quote ('')
+    runs-on: ${{ (inputs.runner_name != '' && inputs.runner_name) || (fromJSON('[''self-hosted'', ''active'']')) }}
     environment: ${{ inputs.stage }}
     steps:
     # Clean build folder. Since this job runs on a self-hosted runner build folder has to be cleaned manually.

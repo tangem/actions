@@ -59,7 +59,8 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON(format("['self-hosted', 'active'{0}]", (inputs.arm_runners_only == "true" && ", 'ARM64'" || "")))) }}
+    # Docs: To use a literal single quote, escape the literal single quote using an additional single quote ('')
+    runs-on: ${{ (inputs.runner_name != '' && inputs.runner_name) || (fromJSON(format('[''self-hosted'', ''active''{0}]', (inputs.arm_runners_only == 'true' && ', ''ARM64''' || '')))) }}
     environment: ${{ inputs.stage }}
     steps:
     # Various code-signing info, do not remove
@@ -83,7 +84,7 @@ jobs:
 
     - name: Checkout private-app-config if needed
       uses: actions/checkout@v3
-      if: "${{ inputs.analyze_archive == 'true' }}"
+      if: ${{ inputs.analyze_archive == 'true' }}
       with:
         repository: tangem/private-app-config
         path: "./private-app-config"
