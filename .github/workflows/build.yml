@@ -1,4 +1,5 @@
 name: Build
+#runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON(format("['self-hosted', 'active', '{0}']", inputs.arm_runners_only == 'true' && 'ARM64' || 'macOS'))) }}
 
 on:
   workflow_call:
@@ -95,6 +96,7 @@ jobs:
 
     # Convert the runner name to upper case so it can be used to access repo variables
     - name: Convert runner name
+      if: ${{ inputs.analyze_archive == 'true' }}
       env:
         RAW_RUNNER_NAME: ${{ runner.name }}
       run: echo "UPPERCASED_RUNNER_NAME=$(echo ${RAW_RUNNER_NAME} | tr '[:lower:]' '[:upper:]')" >> $GITHUB_ENV
