@@ -55,17 +55,13 @@ jobs:
       id: statuses
       run: |
         if ${{ inputs.status == 'building' }}; then
-          echo "status=🕑 *Building…*" >> $GITHUB_OUTPUT
-          echo "color=null" >> $GITHUB_OUTPUT
+          echo "status=🟡 *Building…*" >> $GITHUB_OUTPUT
         elif ${{ inputs.status == 'deploying' }}; then
-          echo "status=🕞 *Deploying…*" >> $GITHUB_OUTPUT
-          echo "color=null" >> $GITHUB_OUTPUT
+          echo "status=🔵 *Deploying…*" >> $GITHUB_OUTPUT
         elif ${{ inputs.status == 'success' }}; then
           echo "status=🟢 *Built and deployed*" >> $GITHUB_OUTPUT
-          echo "color=green" >> $GITHUB_OUTPUT
         elif ${{ inputs.status == 'error' }}; then
           echo "status=🔴 *Error occured*" >> $GITHUB_OUTPUT
-          echo "color=red" >> $GITHUB_OUTPUT
         fi
 
     - name: Prepare changelog
