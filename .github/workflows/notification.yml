@@ -62,6 +62,8 @@ jobs:
           echo "status=🟢 *Built and deployed*" >> $GITHUB_OUTPUT
         elif ${{ inputs.status == 'error' }}; then
           echo "status=🔴 *Error occured*" >> $GITHUB_OUTPUT
+        elif ${{ inputs.status == 'cancel' }}; then
+          echo "status=⚪️ *Build cancelled*" >> $GITHUB_OUTPUT
         fi
 
     - name: Prepare changelog
