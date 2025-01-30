@@ -1,5 +1,4 @@
 name: Build
-#runs-on: ${{ (inputs.runner_name != "" && inputs.runner_name) || (fromJSON(format("['self-hosted', 'active', '{0}']", inputs.arm_runners_only == 'true' && 'ARM64' || 'macOS'))) }}
 
 on:
   workflow_call:
