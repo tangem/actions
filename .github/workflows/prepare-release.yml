@@ -1,5 +1,5 @@
 name: Prepare Release
-# This action creates 
+
 on:
   workflow_call:
     inputs:
@@ -18,7 +18,7 @@ on:
         required: true
       JIRA_API_TOKEN:
         required: true
-        
+
 jobs:
   prepare:
     name: Create release branch
@@ -30,11 +30,11 @@ jobs:
       build_number: ${{ github.run_number }}  # TODO: Fetch actual build number
     steps:
     - name: Create release branch
-      uses: actions/github-script@v4
+      uses: actions/github-script@v7
       with:
-        github-token: ${{secrets.GITHUB_TOKEN}}
+        github-token: ${{ secrets.GH_MOBILE_PAT }}
         script: |
-          github.git.createRef({
+          await github.rest.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
             ref: "refs/heads/releases/${{ inputs.versionName }}",
