@@ -27,7 +27,7 @@ jobs:
       changelog: ${{ steps.changelog.outputs.result }}
       version: ${{ steps.jira.outputs.key }}
       stage: "RC"
-      build_number: ${{ github.run_number }}
+      build_number: ${{ github.run_number }}  # TODO: Fetch actual build number
     steps:
     - name: Create release branch
       uses: actions/github-script@v4
@@ -37,12 +37,13 @@ jobs:
           github.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: "refs/heads/${{ inputs.releaseType }}/${{ inputs.versionName }}",
+            ref: "refs/heads/releases/${{ inputs.versionName }}",
             sha: context.sha
           })
 
     - name: Jira Login
       uses: atlassian/gajira-login@master
+      if: ${{ inputs.releaseType == 'release' }}
       env:
         JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
         JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
@@ -50,6 +51,7 @@ jobs:
 
     - name: Jira Rename Version
       uses: tangem/jira-action@master
+      if: ${{ inputs.releaseType == 'release' }}
       with:
        action: renameVersion
        project: IOS
@@ -58,6 +60,7 @@ jobs:
   
     - name: Create Pull request to master
       uses: actions/github-script@v4
+      if: false # TODO: Remove if not used
       with:
         github-token: ${{secrets.GH_MOBILE_PAT}}
         script: |
