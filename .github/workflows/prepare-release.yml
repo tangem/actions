@@ -30,7 +30,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        sparse-checkout: bootstrap.sh # Just a single file, isn't actually used
+        sparse-checkout: bootstrap.sh # Just a single file to speed-up the checkout, isn't actually used
         sparse-checkout-cone-mode: false
         ssh-key: ${{ secrets.CREATE_RELEASE_BRANCH_KEY }}
 
@@ -43,7 +43,7 @@ jobs:
     # GitHub REST API and branch protection rules/rulesets; see for details:
     # - https://github.com/orgs/community/discussions/25305
     # - https://github.com/orgs/community/discussions/78831
-    # - https://github.com/sbellone/release-workflow-example
+    # - https://github.com/sbellone/release-workflow-example (Working POC)
     - name: Create and push release branch
       env:
         BRANCH_NAME: 'releases/${{ inputs.versionName }}'
@@ -52,14 +52,14 @@ jobs:
         git push -u origin "$BRANCH_NAME"
 
   prepare:
-    name: Create release branch
+    name: Prepare Jira version
     runs-on: ubuntu-latest
     needs: create_release_branch
     outputs:
       changelog: ${{ steps.changelog.outputs.result }}
       version: ${{ steps.jira.outputs.key }}
       stage: "RC"
-      build_number: ${{ github.run_number }}  # TODO: Fetch actual build number
+      build_number: ${{ github.run_number }}  # TODO: Fetch the actual build number for an RC build
     steps:
     - name: Jira Login
       uses: atlassian/gajira-login@master
