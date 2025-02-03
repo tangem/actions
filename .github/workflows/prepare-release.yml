@@ -18,29 +18,49 @@ on:
         required: true
       JIRA_API_TOKEN:
         required: true
+      CREATE_RELEASE_BRANCH_KEY:
+        required: true
 
 jobs:
+  create_release_branch:
+    name: Create release branch
+    runs-on: ubuntu-latest
+    environment: 'Create Release'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        sparse-checkout: bootstrap.sh # Just a single file, isn't actually used
+        sparse-checkout-cone-mode: false
+        ssh-key: ${{ secrets.CREATE_RELEASE_BRANCH_KEY }}
+
+    - name: Configure git
+      run: |
+        git config --global user.name "Tangem Service"
+        git config --global user.email "gitservice@tangem.com"
+
+    # Release branch is created using `git` + deploy keys due to incompatibility of 
+    # GitHub REST API and branch protection rules/rulesets; see for details:
+    # - https://github.com/orgs/community/discussions/25305
+    # - https://github.com/orgs/community/discussions/78831
+    # - https://github.com/sbellone/release-workflow-example
+    - name: Create and push release branch
+      env:
+        BRANCH_NAME: 'releases/${{ inputs.versionName }}'
+      run: |
+        git checkout -b "$BRANCH_NAME"
+        git push -u origin "$BRANCH_NAME"
+
   prepare:
     name: Create release branch
     runs-on: ubuntu-latest
+    needs: create_release_branch
     outputs:
       changelog: ${{ steps.changelog.outputs.result }}
       version: ${{ steps.jira.outputs.key }}
       stage: "RC"
       build_number: ${{ github.run_number }}  # TODO: Fetch actual build number
     steps:
-    - name: Create release branch
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ secrets.GH_MOBILE_PAT }}
-        script: |
-          await github.rest.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: "refs/heads/releases/${{ inputs.versionName }}",
-            sha: context.sha
-          })
-
     - name: Jira Login
       uses: atlassian/gajira-login@master
       if: ${{ inputs.releaseType == 'release' }}
