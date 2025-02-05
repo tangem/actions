@@ -64,12 +64,15 @@ jobs:
           project: 'IOS'
           version: '${{ inputs.next_version_name }}'
 
+      - name: Debug
+        env:
+          KEY: '${{ needs.prepare.outputs.jira_issue_key }}'
+        run: echo "jira_issue_key: ${KEY}"
+
       - name: Jira Set Version To Issues
         uses: tangem/jira-action@master
         with:
           action: 'setVersionToIssues'
           project: 'IOS'
           version: '${{ inputs.next_version_name }}'
-          # `setVersionToIssues` expects an array of Jira tasks as an argument, so we're creating such array here
-          # Docs: To use a literal single quote, escape the literal single quote using an additional single quote ('')
-          issues: ${{ fromJSON(format('[''{0}'']', needs.prepare.outputs.jira_issue_key)) }}
+          issues: '${{ needs.prepare.outputs.jira_issue_key }}'
